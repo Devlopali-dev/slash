@@ -35,7 +35,24 @@ var privateIPNets = func() []*net.IPNet {
 }()
 
 // ValidateShortcutLink checks that a URL is a safe public http/https URL.
-// Rejects non-http(s) schemes, missing hosts, and literal private/loopback IPs.
+// ValidateHTTPURL checks that rawURL uses http or https and has a host.
+// It does NOT block private IPs — use this for OAuth2 endpoints where SSRF
+// is mitigated at request time by safeHTTPClient.
+func ValidateHTTPURL(rawURL string) error {
+	u, err := url.Parse(rawURL)
+	if err != nil {
+		return errors.New("invalid URL")
+	}
+	if u.Scheme != "http" && u.Scheme != "https" {
+		return errors.Errorf("unsupported scheme %q: only http and https are allowed", u.Scheme)
+	}
+	if u.Host == "" {
+		return errors.New("URL must have a host")
+	}
+	return nil
+}
+
+// ValidateShortcutLink rejects non-http(s) schemes, missing hosts, and literal private/loopback IPs.
 func ValidateShortcutLink(rawURL string) error {
 	u, err := url.Parse(rawURL)
 	if err != nil {

@@ -37,12 +37,16 @@ func NewIdentityProvider(config *storepb.IdentityProviderConfig_OAuth2Config) (*
 	}
 
 	for rawURL, field := range map[string]string{
-		config.AuthUrl:     "authUrl",
 		config.TokenUrl:    "tokenUrl",
 		config.UserInfoUrl: "userInfoUrl",
 	} {
-		if err := util.ValidateShortcutLink(rawURL); err != nil {
+		if err := util.ValidateHTTPURL(rawURL); err != nil {
 			return nil, errors.Errorf(`the field "%s" is invalid: %v`, field, err)
+		}
+	}
+	if config.AuthUrl != "" {
+		if err := util.ValidateHTTPURL(config.AuthUrl); err != nil {
+			return nil, errors.Errorf(`the field "authUrl" is invalid: %v`, err)
 		}
 	}
 
