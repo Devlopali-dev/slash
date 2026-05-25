@@ -52,34 +52,25 @@ func (in *GRPCAuthInterceptor) AuthenticationInterceptor(ctx context.Context, re
 		return nil, status.Errorf(codes.Unauthenticated, "failed to get access token from metadata: %v", err)
 	}
 
-	userID, err := in.authenticate(ctx, accessToken)
+	user, err := in.authenticate(ctx, accessToken)
 	if err != nil {
 		if isUnauthorizeAllowedMethod(serverInfo.FullMethod) {
 			return handler(ctx, request)
 		}
 		return nil, err
 	}
-	user, err := in.Store.GetUser(ctx, &store.FindUser{
-		ID: &userID,
-	})
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to get user")
-	}
-	if user == nil {
-		return nil, status.Errorf(codes.Unauthenticated, "user ID %q not exists in the access token", userID)
-	}
 	if isOnlyForAdminAllowedMethod(serverInfo.FullMethod) && user.Role != store.RoleAdmin {
-		return nil, status.Errorf(codes.PermissionDenied, "user ID %q is not admin", userID)
+		return nil, status.Errorf(codes.PermissionDenied, "user ID %q is not admin", user.ID)
 	}
 
 	// Stores userID into context.
-	childCtx := context.WithValue(ctx, userIDContextKey, userID)
+	childCtx := context.WithValue(ctx, userIDContextKey, user.ID)
 	return handler(childCtx, request)
 }
 
-func (in *GRPCAuthInterceptor) authenticate(ctx context.Context, accessToken string) (int32, error) {
+func (in *GRPCAuthInterceptor) authenticate(ctx context.Context, accessToken string) (*store.User, error) {
 	if accessToken == "" {
-		return 0, status.Errorf(codes.Unauthenticated, "access token not found")
+		return nil, status.Errorf(codes.Unauthenticated, "access token not found")
 	}
 	claims := &ClaimsMessage{}
 	_, err := jwt.ParseWithClaims(accessToken, claims, func(t *jwt.Token) (any, error) {
@@ -94,10 +85,10 @@ func (in *GRPCAuthInterceptor) authenticate(ctx context.Context, accessToken str
 		return nil, status.Errorf(codes.Unauthenticated, "unexpected access token kid=%v", t.Header["kid"])
 	})
 	if err != nil {
-		return 0, status.Errorf(codes.Unauthenticated, "Invalid or expired access token")
+		return nil, status.Errorf(codes.Unauthenticated, "Invalid or expired access token")
 	}
 	if !audienceContains(claims.Audience, AccessTokenAudienceName) {
-		return 0, status.Errorf(codes.Unauthenticated,
+		return nil, status.Errorf(codes.Unauthenticated,
 			"invalid access token, audience mismatch, got %q, expected %q. you may send request to the wrong environment",
 			claims.Audience,
 			AccessTokenAudienceName,
@@ -106,30 +97,30 @@ func (in *GRPCAuthInterceptor) authenticate(ctx context.Context, accessToken str
 
 	userID, err := util.ConvertStringToInt32(claims.Subject)
 	if err != nil {
-		return 0, status.Errorf(codes.Unauthenticated, "malformed ID %q in the access token", claims.Subject)
+		return nil, status.Errorf(codes.Unauthenticated, "malformed ID %q in the access token", claims.Subject)
 	}
 	user, err := in.Store.GetUser(ctx, &store.FindUser{
 		ID: &userID,
 	})
 	if err != nil {
-		return 0, status.Errorf(codes.Unauthenticated, "failed to find user ID %q in the access token", userID)
+		return nil, status.Errorf(codes.Unauthenticated, "failed to find user ID %q in the access token", userID)
 	}
 	if user == nil {
-		return 0, status.Errorf(codes.Unauthenticated, "user ID %q not exists in the access token", userID)
+		return nil, status.Errorf(codes.Unauthenticated, "user ID %q not exists in the access token", userID)
 	}
 	if user.RowStatus == storepb.RowStatus_ARCHIVED {
-		return 0, status.Errorf(codes.Unauthenticated, "user ID %q has been deactivated by administrators", userID)
+		return nil, status.Errorf(codes.Unauthenticated, "user ID %q has been deactivated by administrators", userID)
 	}
 
 	accessTokens, err := in.Store.GetUserAccessTokens(ctx, user.ID)
 	if err != nil {
-		return 0, errors.Wrapf(err, "failed to get user access tokens")
+		return nil, errors.Wrapf(err, "failed to get user access tokens")
 	}
 	if !validateAccessToken(accessToken, accessTokens) {
-		return 0, status.Errorf(codes.Unauthenticated, "invalid access token")
+		return nil, status.Errorf(codes.Unauthenticated, "invalid access token")
 	}
 
-	return userID, nil
+	return user, nil
 }
 
 func getTokenFromMetadata(md metadata.MD) (string, error) {
