@@ -12,7 +12,6 @@ import (
 	"unicode/utf8"
 
 	"github.com/google/uuid"
-	"github.com/nyaruka/phonenumbers"
 	"github.com/pkg/errors"
 )
 
@@ -115,18 +114,6 @@ func RandomString(n int) (string, error) {
 	return sb.String(), nil
 }
 
-// ValidatePhone validates the phone number.
-func ValidatePhone(phone string) error {
-	phoneNumber, err := phonenumbers.Parse(phone, "")
-	if err != nil {
-		return err
-	}
-	if !phonenumbers.IsValidNumber(phoneNumber) {
-		return errors.New("invalid phone number")
-	}
-	return nil
-}
-
 // SanitizeUTF8String returns a copy of the string s with each run of invalid or unprintable UTF-8 byte sequences
 // replaced by its hexadecimal representation string.
 func SanitizeUTF8String(s string) string {
@@ -204,8 +191,3 @@ func TruncateStringWithDescription(str string) string {
 	return str
 }
 
-// ValidateURI validates the URI.
-func ValidateURI(uri string) bool {
-	u, err := url.Parse(uri)
-	return err == nil && u.Scheme != "" && u.Host != ""
-}
