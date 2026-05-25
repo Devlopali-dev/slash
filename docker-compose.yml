@@ -1,7 +1,7 @@
 version: '3'
 services:
   slash:
-    image: yourselfhosted/slash:latest
+    image: yourselfhosted/slash:stable
     container_name: slash
     ports:
       - 5231:5231
