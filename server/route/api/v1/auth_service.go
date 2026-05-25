@@ -217,14 +217,51 @@ func (s *APIV1Service) doSignIn(ctx context.Context, user *store.User, expireTim
 	return nil
 }
 
-func (*APIV1Service) SignOut(ctx context.Context, _ *v1pb.SignOutRequest) (*emptypb.Empty, error) {
-	// Set the cookie header to expire access token.
+func (s *APIV1Service) SignOut(ctx context.Context, _ *v1pb.SignOutRequest) (*emptypb.Empty, error) {
+	// Revoke the token from the store so it cannot be reused after logout.
+	md, ok := metadata.FromIncomingContext(ctx)
+	if ok {
+		accessToken, err := getTokenFromMetadata(md)
+		if err == nil && accessToken != "" {
+			user, err := getCurrentUser(ctx, s.Store)
+			if err == nil && user != nil {
+				if err := s.deleteAccessTokenFromStore(ctx, user, accessToken); err != nil {
+					return nil, status.Errorf(codes.Internal, "failed to revoke access token: %v", err)
+				}
+			}
+		}
+	}
+
+	// Expire the cookie on the client side.
 	if err := grpc.SetHeader(ctx, metadata.New(map[string]string{
 		"Set-Cookie": fmt.Sprintf("%s=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; SameSite=Strict", AccessTokenCookieName),
 	})); err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to set grpc header, error: %v", err)
 	}
 	return &emptypb.Empty{}, nil
+}
+
+func (s *APIV1Service) deleteAccessTokenFromStore(ctx context.Context, user *store.User, accessToken string) error {
+	tokens, err := s.Store.GetUserAccessTokens(ctx, user.ID)
+	if err != nil {
+		return err
+	}
+	updated := make([]*storepb.UserSetting_AccessTokensSetting_AccessToken, 0, len(tokens))
+	for _, t := range tokens {
+		if t.AccessToken != accessToken {
+			updated = append(updated, t)
+		}
+	}
+	_, err = s.Store.UpsertUserSetting(ctx, &storepb.UserSetting{
+		UserId: user.ID,
+		Key:    storepb.UserSettingKey_USER_SETTING_ACCESS_TOKENS,
+		Value: &storepb.UserSetting_AccessTokens{
+			AccessTokens: &storepb.UserSetting_AccessTokensSetting{
+				AccessTokens: updated,
+			},
+		},
+	})
+	return err
 }
 
 func (s *APIV1Service) checkSeatAvailability(ctx context.Context) error {
