@@ -22,11 +22,8 @@ const CollectionSpace = () => {
   const [shortcuts, setShortcuts] = useState<Shortcut[]>([]);
   const [selectedShortcut, setSelectedShortcut] = useState<Shortcut>();
 
-  if (!collectionName) {
-    return null;
-  }
-
   useEffect(() => {
+    if (!collectionName) return;
     (async () => {
       try {
         const collection = await collectionStore.fetchCollectionByName(collectionName);
@@ -49,6 +46,10 @@ const CollectionSpace = () => {
       }
     })();
   }, [collectionName]);
+
+  if (!collectionName) {
+    return null;
+  }
 
   if (!collection) {
     return null;
