@@ -255,6 +255,10 @@ func (s *APIV1Service) DeleteShortcut(ctx context.Context, request *v1pb.DeleteS
 }
 
 func (s *APIV1Service) GetShortcutAnalytics(ctx context.Context, request *v1pb.GetShortcutAnalyticsRequest) (*v1pb.GetShortcutAnalyticsResponse, error) {
+	currentUser, err := getCurrentUser(ctx, s.Store)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to get current user: %v", err)
+	}
 	shortcut, err := s.Store.GetShortcut(ctx, &store.FindShortcut{
 		ID: &request.Id,
 	})
@@ -263,6 +267,9 @@ func (s *APIV1Service) GetShortcutAnalytics(ctx context.Context, request *v1pb.G
 	}
 	if shortcut == nil {
 		return nil, status.Errorf(codes.NotFound, "shortcut not found")
+	}
+	if shortcut.CreatorId != currentUser.ID && currentUser.Role != store.RoleAdmin {
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	activityFind := &store.FindActivity{
