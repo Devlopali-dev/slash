@@ -4,6 +4,7 @@ import (
 	"context"
 	"embed"
 	"fmt"
+	"html"
 	"io/fs"
 	"log/slog"
 	"net/http"
@@ -212,17 +213,19 @@ func getDefaultMetadata() *Metadata {
 }
 
 func (m *Metadata) String() string {
+	title := html.EscapeString(m.Title)
+	description := html.EscapeString(m.Description)
+	imageURL := html.EscapeString(m.ImageURL)
 	metadataList := []string{
-		fmt.Sprintf(`<title>%s</title>`, m.Title),
-		fmt.Sprintf(`<meta name="description" content="%s" />`, m.Description),
-		fmt.Sprintf(`<meta property="og:title" content="%s" />`, m.Title),
-		fmt.Sprintf(`<meta property="og:description" content="%s" />`, m.Description),
-		fmt.Sprintf(`<meta property="og:image" content="%s" />`, m.ImageURL),
+		fmt.Sprintf(`<title>%s</title>`, title),
+		fmt.Sprintf(`<meta name="description" content="%s" />`, description),
+		fmt.Sprintf(`<meta property="og:title" content="%s" />`, title),
+		fmt.Sprintf(`<meta property="og:description" content="%s" />`, description),
+		fmt.Sprintf(`<meta property="og:image" content="%s" />`, imageURL),
 		`<meta property="og:type" content="website" />`,
-		// Twitter related fields.
-		fmt.Sprintf(`<meta property="twitter:title" content="%s" />`, m.Title),
-		fmt.Sprintf(`<meta property="twitter:description" content="%s" />`, m.Description),
-		fmt.Sprintf(`<meta property="twitter:image" content="%s" />`, m.ImageURL),
+		fmt.Sprintf(`<meta property="twitter:title" content="%s" />`, title),
+		fmt.Sprintf(`<meta property="twitter:description" content="%s" />`, description),
+		fmt.Sprintf(`<meta property="twitter:image" content="%s" />`, imageURL),
 	}
 	return strings.Join(metadataList, "\n")
 }
