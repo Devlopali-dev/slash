@@ -16,7 +16,7 @@ const ViewSetting = () => {
   return (
     <Dropdown
       trigger={
-        <button>
+        <button aria-label="View settings">
           <Icon.Settings2 className="w-4 h-auto text-muted-foreground" />
         </button>
       }

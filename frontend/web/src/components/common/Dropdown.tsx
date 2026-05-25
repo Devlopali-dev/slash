@@ -20,7 +20,7 @@ const Dropdown: React.FC<Props> = (props: Props) => {
         {trigger ? (
           <div>{trigger}</div>
         ) : (
-          <button className="flex flex-row justify-center items-center rounded text-muted-foreground hover:text-foreground transition-colors">
+          <button aria-label="More actions" className="flex flex-row justify-center items-center rounded text-muted-foreground hover:text-foreground transition-colors">
             <Icon.MoreVertical className="w-4 h-auto" />
           </button>
         )}

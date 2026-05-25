@@ -73,6 +73,7 @@ const ShortcutCard = (props: Props) => {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button
+                    aria-label="Copy shortcut link"
                     className="hidden group-hover:block text-muted-foreground hover:text-foreground transition-colors"
                     onClick={() => handleCopyButtonClick()}
                   >
