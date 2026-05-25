@@ -176,21 +176,24 @@ func (s *APIV1Service) SignUp(ctx context.Context, request *v1pb.SignUpRequest) 
 		Email:        request.Email,
 		Nickname:     request.Nickname,
 		PasswordHash: string(passwordHash),
+		Role:         store.RoleUser,
 	}
-	existingUsers, err := s.Store.ListUsers(ctx, &store.FindUser{})
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to list users: %v", err)
-	}
-	// The first user to sign up is an admin by default.
-	if len(existingUsers) == 0 {
-		create.Role = store.RoleAdmin
-	} else {
-		create.Role = store.RoleUser
-	}
-
 	user, err := s.Store.CreateUser(ctx, create)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to create user: %v", err)
+	}
+	// Promote to admin only if this is the sole user in the DB.
+	// Checking after insert avoids the TOCTOU race of checking before insert.
+	allUsers, err := s.Store.ListUsers(ctx, &store.FindUser{})
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to list users: %v", err)
+	}
+	if len(allUsers) == 1 {
+		adminRole := store.RoleAdmin
+		user, err = s.Store.UpdateUser(ctx, &store.UpdateUser{ID: user.ID, Role: &adminRole})
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to promote first user to admin: %v", err)
+		}
 	}
 	if err := s.doSignIn(ctx, user, time.Now().Add(AccessTokenDuration)); err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to sign in: %v", err)
