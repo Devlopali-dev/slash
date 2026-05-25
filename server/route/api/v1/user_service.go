@@ -35,6 +35,10 @@ func (s *APIV1Service) ListUsers(ctx context.Context, _ *v1pb.ListUsersRequest) 
 }
 
 func (s *APIV1Service) GetUser(ctx context.Context, request *v1pb.GetUserRequest) (*v1pb.User, error) {
+	currentUser, err := getCurrentUser(ctx, s.Store)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to get current user: %v", err)
+	}
 	user, err := s.Store.GetUser(ctx, &store.FindUser{
 		ID: &request.Id,
 	})
@@ -44,7 +48,12 @@ func (s *APIV1Service) GetUser(ctx context.Context, request *v1pb.GetUserRequest
 	if user == nil {
 		return nil, status.Errorf(codes.NotFound, "user not found")
 	}
-	return convertUserFromStore(user), nil
+	converted := convertUserFromStore(user)
+	// Scrub email for callers who are neither the user themselves nor an admin.
+	if currentUser.ID != user.ID && currentUser.Role != store.RoleAdmin {
+		converted.Email = ""
+	}
+	return converted, nil
 }
 
 func (s *APIV1Service) CreateUser(ctx context.Context, request *v1pb.CreateUserRequest) (*v1pb.User, error) {
