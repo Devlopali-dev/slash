@@ -17,6 +17,7 @@ import (
 
 	v1pb "github.com/yourselfhosted/slash/proto/gen/api/v1"
 	storepb "github.com/yourselfhosted/slash/proto/gen/store"
+	"github.com/yourselfhosted/slash/internal/util"
 	"github.com/yourselfhosted/slash/server/service/license"
 	"github.com/yourselfhosted/slash/store"
 )
@@ -97,6 +98,9 @@ func (s *APIV1Service) GetShortcutByName(ctx context.Context, request *v1pb.GetS
 func (s *APIV1Service) CreateShortcut(ctx context.Context, request *v1pb.CreateShortcutRequest) (*v1pb.Shortcut, error) {
 	if request.Shortcut.Name == "" || request.Shortcut.Link == "" {
 		return nil, status.Errorf(codes.InvalidArgument, "name and link are required")
+	}
+	if err := util.ValidateShortcutLink(request.Shortcut.Link); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid link: %v", err)
 	}
 
 	if !s.LicenseService.IsFeatureEnabled(license.FeatureTypeUnlimitedShortcuts) {
@@ -187,6 +191,9 @@ func (s *APIV1Service) UpdateShortcut(ctx context.Context, request *v1pb.UpdateS
 		case "name":
 			update.Name = &request.Shortcut.Name
 		case "link":
+			if err := util.ValidateShortcutLink(request.Shortcut.Link); err != nil {
+				return nil, status.Errorf(codes.InvalidArgument, "invalid link: %v", err)
+			}
 			update.Link = &request.Shortcut.Link
 		case "title":
 			update.Title = &request.Shortcut.Title

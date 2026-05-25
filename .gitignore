@@ -7,7 +7,11 @@ build
 .DS_Store
 
 node_modules
+graphify-out
 
 .env
+.idea
+.remember
+.claude
 
 dist/
