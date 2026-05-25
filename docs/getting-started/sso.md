@@ -35,3 +35,43 @@ Slash will use the mapping to import the user profile fields when creating new a
 
 - **Identifier** is the field name of primary email in 3rd-party user info;
 - **Display name** is the field name of display name in 3rd-party user info (optional);
+
+## Provider examples
+
+### GitHub
+
+| Field | Value |
+|-------|-------|
+| Authorization endpoint | `https://github.com/login/oauth/authorize` |
+| Token endpoint | `https://github.com/login/oauth/access_token` |
+| User endpoint | `https://api.github.com/user` |
+| Scopes | `read:user user:email` |
+| Identifier | `email` |
+| Display name | `name` |
+
+### Authentik
+
+In Authentik, create an **OAuth2/OpenID Connect Provider** and a corresponding Application, then use the following values:
+
+| Field | Value |
+|-------|-------|
+| Authorization endpoint | `https://<authentik-host>/application/o/<app-slug>/authorize/` |
+| Token endpoint | `https://<authentik-host>/application/o/<app-slug>/token/` |
+| User endpoint | `https://<authentik-host>/application/o/userinfo/` |
+| Scopes | `openid email profile` |
+| Identifier | `email` |
+| Display name | `name` |
+
+> The Client ID and Client Secret are found in your Authentik application's **OAuth2 Provider** settings.
+> Authentik's userinfo endpoint returns `email`, `name`, and `preferred_username` among others — use `email` as the identifier since Slash requires a valid email address for each account.
+
+### Google
+
+| Field | Value |
+|-------|-------|
+| Authorization endpoint | `https://accounts.google.com/o/oauth2/v2/auth` |
+| Token endpoint | `https://oauth2.googleapis.com/token` |
+| User endpoint | `https://www.googleapis.com/oauth2/v3/userinfo` |
+| Scopes | `openid email profile` |
+| Identifier | `email` |
+| Display name | `name` |
