@@ -85,6 +85,7 @@ const ShortcutDetail = () => {
           )}
           href={shortcutLink}
           target="_blank"
+          rel="noopener noreferrer"
         >
           <div className="truncate text-3xl">
             {shortcut.title ? (

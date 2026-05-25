@@ -82,6 +82,7 @@ const CollectionView = (props: Props) => {
                   className="w-auto text-muted-foreground cursor-pointer hover:text-foreground"
                   to={`/c/${collection.name}`}
                   target="_blank"
+                  rel="noopener noreferrer"
                 >
                   <Icon.Share className="w-4 h-auto" />
                 </Link>

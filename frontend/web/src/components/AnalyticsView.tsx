@@ -45,7 +45,7 @@ const AnalyticsView: React.FC<Props> = (props: Props) => {
                     <div key={reference.name} className="w-full flex flex-row justify-between items-center">
                       <span className="whitespace-nowrap py-2 px-2 text-sm truncate text-foreground">
                         {reference.name ? (
-                          <a className="hover:underline hover:text-primary" href={reference.name} target="_blank">
+                          <a className="hover:underline hover:text-primary" href={reference.name} target="_blank" rel="noopener noreferrer">
                             {reference.name}
                           </a>
                         ) : (
