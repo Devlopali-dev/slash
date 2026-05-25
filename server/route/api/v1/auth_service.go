@@ -210,7 +210,7 @@ func (s *APIV1Service) doSignIn(ctx context.Context, user *store.User, expireTim
 		return status.Errorf(codes.Internal, "failed to upsert access token to store: %v", err)
 	}
 
-	cookie := fmt.Sprintf("%s=%s; Path=/; Expires=%s; HttpOnly; SameSite=Strict", AccessTokenCookieName, accessToken, time.Now().Add(AccessTokenDuration).Format(time.RFC1123))
+	cookie := fmt.Sprintf("%s=%s; Path=/; Expires=%s; HttpOnly; SameSite=Strict; Secure", AccessTokenCookieName, accessToken, time.Now().Add(AccessTokenDuration).Format(time.RFC1123))
 	if err := grpc.SetHeader(ctx, metadata.New(map[string]string{
 		"Set-Cookie": cookie,
 	})); err != nil {
