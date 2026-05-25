@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"crypto/subtle"
 	"net/http"
 	"strings"
 
@@ -165,7 +166,7 @@ func audienceContains(audience jwt.ClaimStrings, token string) bool {
 
 func validateAccessToken(accessTokenString string, userAccessTokens []*storepb.UserSetting_AccessTokensSetting_AccessToken) bool {
 	for _, userAccessToken := range userAccessTokens {
-		if accessTokenString == userAccessToken.AccessToken {
+		if subtle.ConstantTimeCompare([]byte(accessTokenString), []byte(userAccessToken.AccessToken)) == 1 {
 			return true
 		}
 	}
