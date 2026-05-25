@@ -16,7 +16,15 @@ import (
 )
 
 func (s *APIV1Service) ListCollections(ctx context.Context, _ *v1pb.ListCollectionsRequest) (*v1pb.ListCollectionsResponse, error) {
-	collections, err := s.Store.ListCollections(ctx, &store.FindCollection{})
+	find := &store.FindCollection{}
+	currentUser, err := getCurrentUser(ctx, s.Store)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to get current user: %v", err)
+	}
+	if currentUser == nil {
+		find.VisibilityList = []storepb.Visibility{storepb.Visibility_PUBLIC}
+	}
+	collections, err := s.Store.ListCollections(ctx, find)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to get collection list, err: %v", err)
 	}

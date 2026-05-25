@@ -23,7 +23,15 @@ import (
 )
 
 func (s *APIV1Service) ListShortcuts(ctx context.Context, _ *v1pb.ListShortcutsRequest) (*v1pb.ListShortcutsResponse, error) {
-	shortcutList, err := s.Store.ListShortcuts(ctx, &store.FindShortcut{})
+	find := &store.FindShortcut{}
+	currentUser, err := getCurrentUser(ctx, s.Store)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to get current user: %v", err)
+	}
+	if currentUser == nil {
+		find.VisibilityList = []storepb.Visibility{storepb.Visibility_PUBLIC}
+	}
+	shortcutList, err := s.Store.ListShortcuts(ctx, find)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to list shortcuts, err: %v", err)
 	}
