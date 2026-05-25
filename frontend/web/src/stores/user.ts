@@ -93,7 +93,7 @@ const useUserStore = create<UserState>()((set, get) => ({
   getCurrentUser: () => {
     const userMap = get().userMapById;
     const currentUserId = get().currentUserId;
-    return userMap[currentUserId as number];
+    return userMap[currentUserId as number] || unknownUser;
   },
   setCurrentUserId: (id: number) => {
     set({
