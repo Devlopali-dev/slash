@@ -183,7 +183,7 @@ const CreateIdentityProviderDrawer: React.FC<Props> = (props: Props) => {
               </Label>
               <Input
                 id="client-secret"
-                type="text"
+                type="password"
                 placeholder="Client Secret of the OAuth2 provider"
                 value={state.identityProviderCreate.config?.oauth2?.clientSecret}
                 onChange={(e) => handleOAuth2ConfigChange(e, "clientSecret")}
