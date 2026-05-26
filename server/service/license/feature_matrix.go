@@ -35,12 +35,12 @@ func (f FeatureType) String() string {
 
 // FeatureMatrix is a matrix of features in [Free, Pro, Enterprise].
 var FeatureMatrix = map[FeatureType][3]bool{
-	FeatureTypeUnlimitedAccounts:    {false, true, true},
-	FeatureTypeUnlimitedShortcuts:   {false, true, true},
-	FeatureTypeUnlimitedCollections: {false, true, true},
-	FeatureTypeCustomeBranding:      {false, false, true},
-	FeatureTypeSSO:                  {false, false, true},
-	FeatureTypeAdvancedAnalytics:    {false, false, true},
+	FeatureTypeUnlimitedAccounts:    {true, true, true},
+	FeatureTypeUnlimitedShortcuts:   {true, true, true},
+	FeatureTypeUnlimitedCollections: {true, true, true},
+	FeatureTypeCustomeBranding:      {true, true, true},
+	FeatureTypeSSO:                  {true, true, true},
+	FeatureTypeAdvancedAnalytics:    {true, true, true},
 }
 
 func getDefaultFeatures(plan v1pb.PlanType) []FeatureType {
