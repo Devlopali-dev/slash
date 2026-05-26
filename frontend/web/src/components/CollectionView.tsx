@@ -103,7 +103,10 @@ const CollectionView = (props: Props) => {
             {showAdminActions && (
               <Dropdown
                 trigger={
-                  <button aria-label="Collection actions" className="flex flex-row justify-center items-center rounded text-muted-foreground cursor-pointer hover:text-foreground">
+                  <button
+                    aria-label="Collection actions"
+                    className="flex flex-row justify-center items-center rounded text-muted-foreground cursor-pointer hover:text-foreground"
+                  >
                     <Icon.MoreVertical className="w-4 h-auto" />
                   </button>
                 }

@@ -112,12 +112,7 @@ const WorkspaceGeneralSettingSection = () => {
             ) : (
               <Icon.CircleSlash className="w-12 h-auto text-muted-foreground mr-2" strokeWidth={1} />
             )}
-            <input
-              className="absolute inset-0 z-1 opacity-0"
-              type="file"
-              accept=".jpg,.jpeg,.png,.svg,.webp"
-              onChange={onBrandingChange}
-            />
+            <input className="absolute inset-0 z-1 opacity-0" type="file" accept=".jpg,.jpeg,.png,.svg,.webp" onChange={onBrandingChange} />
             <p className="text-xs opacity-60">(Click to select file)</p>
           </div>
         </div>
