@@ -8,9 +8,9 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	v1pb "github.com/Devlopali-dev/slash/proto/gen/api/v1"
-	storepb "github.com/Devlopali-dev/slash/proto/gen/store"
-	"github.com/Devlopali-dev/slash/store"
+	v1pb "github.com/yourselfhosted/slash/proto/gen/api/v1"
+	storepb "github.com/yourselfhosted/slash/proto/gen/store"
+	"github.com/yourselfhosted/slash/store"
 )
 
 func (s *APIV1Service) GetWorkspaceProfile(ctx context.Context, _ *v1pb.GetWorkspaceProfileRequest) (*v1pb.WorkspaceProfile, error) {

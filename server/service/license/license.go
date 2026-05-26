@@ -10,12 +10,12 @@ import (
 	"github.com/pkg/errors"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	v1pb "github.com/Devlopali-dev/slash/proto/gen/api/v1"
-	storepb "github.com/Devlopali-dev/slash/proto/gen/store"
-	"github.com/Devlopali-dev/slash/server/profile"
-	"github.com/Devlopali-dev/slash/server/service/license/gumroad"
-	"github.com/Devlopali-dev/slash/server/service/license/lemonsqueezy"
-	"github.com/Devlopali-dev/slash/store"
+	v1pb "github.com/yourselfhosted/slash/proto/gen/api/v1"
+	storepb "github.com/yourselfhosted/slash/proto/gen/store"
+	"github.com/yourselfhosted/slash/server/profile"
+	"github.com/yourselfhosted/slash/server/service/license/gumroad"
+	"github.com/yourselfhosted/slash/server/service/license/lemonsqueezy"
+	"github.com/yourselfhosted/slash/store"
 )
 
 //go:embed slash.public.pem

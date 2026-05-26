@@ -5,8 +5,8 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/Devlopali-dev/slash/server/service/license"
-	"github.com/Devlopali-dev/slash/store"
+	"github.com/yourselfhosted/slash/server/service/license"
+	"github.com/yourselfhosted/slash/store"
 )
 
 type Runner struct {

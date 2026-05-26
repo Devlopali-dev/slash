@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/Devlopali-dev/slash/store"
+	"github.com/yourselfhosted/slash/store"
 )
 
 func TestActivityStore(t *testing.T) {

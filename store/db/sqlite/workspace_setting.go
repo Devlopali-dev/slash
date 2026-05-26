@@ -8,8 +8,8 @@ import (
 
 	"google.golang.org/protobuf/encoding/protojson"
 
-	storepb "github.com/Devlopali-dev/slash/proto/gen/store"
-	"github.com/Devlopali-dev/slash/store"
+	storepb "github.com/yourselfhosted/slash/proto/gen/store"
+	"github.com/yourselfhosted/slash/store"
 )
 
 func (d *DB) UpsertWorkspaceSetting(ctx context.Context, upsert *storepb.WorkspaceSetting) (*storepb.WorkspaceSetting, error) {

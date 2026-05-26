@@ -4,9 +4,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/Devlopali-dev/slash/server/common"
-	"github.com/Devlopali-dev/slash/server/profile"
-	"github.com/Devlopali-dev/slash/store"
+	"github.com/yourselfhosted/slash/server/common"
+	"github.com/yourselfhosted/slash/server/profile"
+	"github.com/yourselfhosted/slash/store"
 )
 
 func TestGetCurrentSchemaVersion(t *testing.T) {

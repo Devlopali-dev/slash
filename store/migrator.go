@@ -15,8 +15,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	storepb "github.com/Devlopali-dev/slash/proto/gen/store"
-	"github.com/Devlopali-dev/slash/server/common"
+	storepb "github.com/yourselfhosted/slash/proto/gen/store"
+	"github.com/yourselfhosted/slash/server/common"
 )
 
 //go:embed migration

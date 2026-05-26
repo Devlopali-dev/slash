@@ -3,7 +3,7 @@ package store
 import (
 	"sync"
 
-	"github.com/Devlopali-dev/slash/server/profile"
+	"github.com/yourselfhosted/slash/server/profile"
 )
 
 // Store provides database access to all raw objects.

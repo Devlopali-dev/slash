@@ -3,7 +3,7 @@ package sqlite
 import (
 	"context"
 
-	"github.com/Devlopali-dev/slash/store"
+	"github.com/yourselfhosted/slash/store"
 )
 
 func (d *DB) UpsertMigrationHistory(ctx context.Context, upsert *store.UpsertMigrationHistory) (*store.MigrationHistory, error) {
