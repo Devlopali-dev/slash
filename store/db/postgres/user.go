@@ -153,8 +153,24 @@ func (d *DB) ListUsers(ctx context.Context, find *store.FindUser) ([]*store.User
 }
 
 func (d *DB) DeleteUser(ctx context.Context, delete *store.DeleteUser) error {
-	if _, err := d.db.ExecContext(ctx, `DELETE FROM "user" WHERE id = $1`, delete.ID); err != nil {
+	tx, err := d.db.BeginTx(ctx, nil)
+	if err != nil {
 		return err
 	}
-	return nil
+	defer tx.Rollback()
+
+	if _, err := tx.ExecContext(ctx, `DELETE FROM "user" WHERE id = $1`, delete.ID); err != nil {
+		return err
+	}
+	if _, err := tx.ExecContext(ctx, `DELETE FROM user_setting WHERE user_id NOT IN (SELECT id FROM "user")`); err != nil {
+		return err
+	}
+	if _, err := tx.ExecContext(ctx, `DELETE FROM shortcut WHERE creator_id NOT IN (SELECT id FROM "user")`); err != nil {
+		return err
+	}
+	if _, err := tx.ExecContext(ctx, `DELETE FROM collection WHERE creator_id NOT IN (SELECT id FROM "user")`); err != nil {
+		return err
+	}
+
+	return tx.Commit()
 }

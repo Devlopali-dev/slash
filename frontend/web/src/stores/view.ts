@@ -100,7 +100,7 @@ export const getOrderedShortcutList = (shortcutList: Shortcut[], order: Order) =
     field: order.field || "name",
     direction: order.direction || "asc",
   };
-  const orderedShortcutList = shortcutList.sort((a, b) => {
+  const orderedShortcutList = [...shortcutList].sort((a, b) => {
     if (field === "name") {
       return direction === "asc" ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
     } else if (field === "createdTs") {

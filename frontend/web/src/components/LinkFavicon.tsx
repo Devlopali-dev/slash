@@ -26,7 +26,7 @@ const LinkFavicon = (props: Props) => {
   };
 
   return faviconUrl ? (
-    <img className="w-full h-auto rounded" src={faviconUrl} decoding="async" loading="lazy" onError={handleImgError} />
+    <img className="w-full h-auto rounded" src={faviconUrl} alt="" decoding="async" loading="lazy" onError={handleImgError} />
   ) : (
     <Icon.CircleSlash className="w-full h-auto text-muted-foreground" strokeWidth={1.5} />
   );

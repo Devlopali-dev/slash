@@ -55,6 +55,7 @@ const ShortcutCard = (props: Props) => {
                   "max-w-[calc(100%-36px)] flex flex-row justify-start items-center mr-1 hover:opacity-80 hover:underline transition-all",
                 )}
                 target="_blank"
+                rel="noopener noreferrer"
                 href={shortcutLink}
               >
                 <div className="truncate">
@@ -72,6 +73,7 @@ const ShortcutCard = (props: Props) => {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button
+                    aria-label="Copy shortcut link"
                     className="hidden group-hover:block text-muted-foreground hover:text-foreground transition-colors"
                     onClick={() => handleCopyButtonClick()}
                   >
@@ -87,6 +89,7 @@ const ShortcutCard = (props: Props) => {
               className="pr-4 leading-tight w-full text-sm truncate text-muted-foreground hover:underline transition-all"
               href={shortcut.link}
               target="_blank"
+              rel="noopener noreferrer"
             >
               {shortcut.link}
             </a>

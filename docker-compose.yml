@@ -1,7 +1,8 @@
 version: '3'
 services:
   slash:
-    image: yourselfhosted/slash:latest
+    build: .
+    image: Devlopali-dev/slash:latest
     container_name: slash
     ports:
       - 5231:5231

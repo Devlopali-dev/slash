@@ -225,11 +225,16 @@ func parseLicenseKey(licenseKey string) (*Claims, error) {
 }
 
 func getSubscriptionForFreePlan() *v1pb.Subscription {
+	features := getDefaultFeatures(v1pb.PlanType_FREE)
+	featureStrings := make([]string, len(features))
+	for i, f := range features {
+		featureStrings[i] = f.String()
+	}
 	return &v1pb.Subscription{
 		Plan:             v1pb.PlanType_FREE,
-		Seats:            5,
-		ShortcutsLimit:   100,
-		CollectionsLimit: 5,
-		Features:         []string{},
+		Seats:            -1,
+		ShortcutsLimit:   -1,
+		CollectionsLimit: -1,
+		Features:         featureStrings,
 	}
 }

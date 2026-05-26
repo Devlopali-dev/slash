@@ -62,9 +62,7 @@ const CreateShortcutDrawer: React.FC<Props> = (props: Props) => {
   useEffect(() => {
     if (workspaceStore.setting.defaultVisibility !== Visibility.VISIBILITY_UNSPECIFIED) {
       setPartialState({
-        shortcutCreate: Object.assign(state.shortcutCreate, {
-          visibility: workspaceStore.setting.defaultVisibility,
-        }),
+        shortcutCreate: { ...state.shortcutCreate, visibility: workspaceStore.setting.defaultVisibility },
       });
     }
   }, []);
@@ -75,14 +73,15 @@ const CreateShortcutDrawer: React.FC<Props> = (props: Props) => {
       if (shortcut) {
         setState({
           ...state,
-          shortcutCreate: Object.assign(state.shortcutCreate, {
+          shortcutCreate: {
+            ...state.shortcutCreate,
             name: shortcut.name,
             link: shortcut.link,
             title: shortcut.title,
             description: shortcut.description,
             visibility: shortcut.visibility,
             ogMetadata: shortcut.ogMetadata,
-          }),
+          },
         });
         setTag(shortcut.tags.join(" "));
         loadingState.setFinish();
@@ -96,33 +95,25 @@ const CreateShortcutDrawer: React.FC<Props> = (props: Props) => {
 
   const handleNameInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPartialState({
-      shortcutCreate: Object.assign(state.shortcutCreate, {
-        name: e.target.value.replace(/\s+/g, "-"),
-      }),
+      shortcutCreate: { ...state.shortcutCreate, name: e.target.value.replace(/\s+/g, "-") },
     });
   };
 
   const handleLinkInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPartialState({
-      shortcutCreate: Object.assign(state.shortcutCreate, {
-        link: e.target.value,
-      }),
+      shortcutCreate: { ...state.shortcutCreate, link: e.target.value },
     });
   };
 
   const handleTitleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPartialState({
-      shortcutCreate: Object.assign(state.shortcutCreate, {
-        title: e.target.value,
-      }),
+      shortcutCreate: { ...state.shortcutCreate, title: e.target.value },
     });
   };
 
   const handleDescriptionInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPartialState({
-      shortcutCreate: Object.assign(state.shortcutCreate, {
-        description: e.target.value,
-      }),
+      shortcutCreate: { ...state.shortcutCreate, description: e.target.value },
     });
   };
 
@@ -133,34 +124,28 @@ const CreateShortcutDrawer: React.FC<Props> = (props: Props) => {
 
   const handleOpenGraphMetadataImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPartialState({
-      shortcutCreate: Object.assign(state.shortcutCreate, {
-        ogMetadata: {
-          ...state.shortcutCreate.ogMetadata,
-          image: e.target.value,
-        },
-      }),
+      shortcutCreate: {
+        ...state.shortcutCreate,
+        ogMetadata: { ...state.shortcutCreate.ogMetadata, image: e.target.value },
+      },
     });
   };
 
   const handleOpenGraphMetadataTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPartialState({
-      shortcutCreate: Object.assign(state.shortcutCreate, {
-        ogMetadata: {
-          ...state.shortcutCreate.ogMetadata,
-          title: e.target.value,
-        },
-      }),
+      shortcutCreate: {
+        ...state.shortcutCreate,
+        ogMetadata: { ...state.shortcutCreate.ogMetadata, title: e.target.value },
+      },
     });
   };
 
   const handleOpenGraphMetadataDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setPartialState({
-      shortcutCreate: Object.assign(state.shortcutCreate, {
-        ogMetadata: {
-          ...state.shortcutCreate.ogMetadata,
-          description: e.target.value,
-        },
-      }),
+      shortcutCreate: {
+        ...state.shortcutCreate,
+        ogMetadata: { ...state.shortcutCreate.ogMetadata, description: e.target.value },
+      },
     });
   };
 
@@ -290,9 +275,7 @@ const CreateShortcutDrawer: React.FC<Props> = (props: Props) => {
                 checked={state.shortcutCreate.visibility === Visibility.PUBLIC}
                 onCheckedChange={(checked) =>
                   setPartialState({
-                    shortcutCreate: Object.assign(state.shortcutCreate, {
-                      visibility: checked ? Visibility.PUBLIC : Visibility.WORKSPACE,
-                    }),
+                    shortcutCreate: { ...state.shortcutCreate, visibility: checked ? Visibility.PUBLIC : Visibility.WORKSPACE },
                   })
                 }
               />

@@ -167,6 +167,10 @@ func (s *APIV1Service) SignUp(ctx context.Context, request *v1pb.SignUpRequest) 
 		return nil, err
 	}
 
+	if len(request.Password) < 8 {
+		return nil, status.Errorf(codes.InvalidArgument, "password must be at least 8 characters")
+	}
+
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to generate password hash: %v", err)
@@ -176,21 +180,24 @@ func (s *APIV1Service) SignUp(ctx context.Context, request *v1pb.SignUpRequest) 
 		Email:        request.Email,
 		Nickname:     request.Nickname,
 		PasswordHash: string(passwordHash),
+		Role:         store.RoleUser,
 	}
-	existingUsers, err := s.Store.ListUsers(ctx, &store.FindUser{})
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to list users: %v", err)
-	}
-	// The first user to sign up is an admin by default.
-	if len(existingUsers) == 0 {
-		create.Role = store.RoleAdmin
-	} else {
-		create.Role = store.RoleUser
-	}
-
 	user, err := s.Store.CreateUser(ctx, create)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to create user: %v", err)
+	}
+	// Promote to admin only if this is the sole user in the DB.
+	// Checking after insert avoids the TOCTOU race of checking before insert.
+	allUsers, err := s.Store.ListUsers(ctx, &store.FindUser{})
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to list users: %v", err)
+	}
+	if len(allUsers) == 1 {
+		adminRole := store.RoleAdmin
+		user, err = s.Store.UpdateUser(ctx, &store.UpdateUser{ID: user.ID, Role: &adminRole})
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to promote first user to admin: %v", err)
+		}
 	}
 	if err := s.doSignIn(ctx, user, time.Now().Add(AccessTokenDuration)); err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to sign in: %v", err)
@@ -207,7 +214,7 @@ func (s *APIV1Service) doSignIn(ctx context.Context, user *store.User, expireTim
 		return status.Errorf(codes.Internal, "failed to upsert access token to store: %v", err)
 	}
 
-	cookie := fmt.Sprintf("%s=%s; Path=/; Expires=%s; HttpOnly; SameSite=Strict", AccessTokenCookieName, accessToken, time.Now().Add(AccessTokenDuration).Format(time.RFC1123))
+	cookie := fmt.Sprintf("%s=%s; Path=/; Expires=%s; HttpOnly; SameSite=Strict; Secure", AccessTokenCookieName, accessToken, time.Now().Add(AccessTokenDuration).Format(time.RFC1123))
 	if err := grpc.SetHeader(ctx, metadata.New(map[string]string{
 		"Set-Cookie": cookie,
 	})); err != nil {

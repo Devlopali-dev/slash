@@ -46,6 +46,7 @@ const ShortcutView = (props: Props) => {
         )}
         to={`/s/${shortcut.name}`}
         target="_blank"
+        rel="noopener noreferrer"
         onClick={(e) => e.stopPropagation()}
       >
         <Icon.ArrowUpRight className="w-4 h-auto text-muted-foreground shrink-0" />

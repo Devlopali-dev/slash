@@ -176,13 +176,7 @@ func (s *APIV1Service) UpdateWorkspaceSetting(ctx context.Context, request *v1pb
 	return workspaceSetting, nil
 }
 
-var ownerCache *v1pb.User
-
 func (s *APIV1Service) GetInstanceOwner(ctx context.Context) (*v1pb.User, error) {
-	if ownerCache != nil {
-		return ownerCache, nil
-	}
-
 	adminRole := store.RoleAdmin
 	user, err := s.Store.GetUser(ctx, &store.FindUser{
 		Role: &adminRole,
@@ -193,9 +187,7 @@ func (s *APIV1Service) GetInstanceOwner(ctx context.Context) (*v1pb.User, error)
 	if user == nil {
 		return nil, nil
 	}
-
-	ownerCache = convertUserFromStore(user)
-	return ownerCache, nil
+	return convertUserFromStore(user), nil
 }
 
 func convertIdentityProviderFromStore(identityProvider *storepb.IdentityProvider) *v1pb.IdentityProvider {

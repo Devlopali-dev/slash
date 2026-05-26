@@ -17,13 +17,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
       - name: Setup buf
-        uses: bufbuild/buf-setup-action@v1
+        uses: bufbuild/buf-setup-action@9802736440b01b57d3b63463f27b2ef49b2ea5b1 # v1.9.0
       - name: buf lint
-        uses: bufbuild/buf-lint-action@v1
+        uses: bufbuild/buf-lint-action@06f9dd823d873146471cfaaf108a993fe00e5325 # v1.1.1
         with:
           input: "proto"
       - name: buf format

@@ -1,4 +1,5 @@
 import { createRoot } from "react-dom/client";
+import { flushSync } from "react-dom";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -76,10 +77,16 @@ export const showCommonDialog = (props: Props) => {
   const dialog = createRoot(tempDiv);
   document.body.append(tempDiv);
 
+  let destroyed = false;
   const destroy = () => {
+    if (destroyed) return;
+    destroyed = true;
+    window.removeEventListener("pagehide", destroy);
     dialog.unmount();
     tempDiv.remove();
   };
+
+  window.addEventListener("pagehide", destroy, { once: true });
 
   const onClose = () => {
     if (props.onClose) {
@@ -95,7 +102,9 @@ export const showCommonDialog = (props: Props) => {
     destroy();
   };
 
-  dialog.render(<Alert {...props} onClose={onClose} onConfirm={onConfirm} />);
+  flushSync(() => {
+    dialog.render(<Alert {...props} onClose={onClose} onConfirm={onConfirm} />);
+  });
 };
 
 export default Alert;

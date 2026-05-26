@@ -54,9 +54,7 @@ const CreateIdentityProviderDrawer: React.FC<Props> = (props: Props) => {
 
   const handleTitleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPartialState({
-      identityProviderCreate: Object.assign(state.identityProviderCreate, {
-        title: e.target.value,
-      }),
+      identityProviderCreate: { ...state.identityProviderCreate, title: e.target.value },
     });
   };
 
@@ -67,13 +65,13 @@ const CreateIdentityProviderDrawer: React.FC<Props> = (props: Props) => {
 
     const value = field === "scopes" ? e.target.value.split(" ") : e.target.value;
     setPartialState({
-      identityProviderCreate: Object.assign(state.identityProviderCreate, {
-        config: Object.assign(state.identityProviderCreate.config, {
-          oauth2: Object.assign(state.identityProviderCreate.config.oauth2, {
-            [field]: value,
-          }),
-        }),
-      }),
+      identityProviderCreate: {
+        ...state.identityProviderCreate,
+        config: {
+          ...state.identityProviderCreate.config,
+          oauth2: { ...state.identityProviderCreate.config.oauth2, [field]: value },
+        },
+      },
     });
   };
 
@@ -87,15 +85,16 @@ const CreateIdentityProviderDrawer: React.FC<Props> = (props: Props) => {
     }
 
     setPartialState({
-      identityProviderCreate: Object.assign(state.identityProviderCreate, {
-        config: Object.assign(state.identityProviderCreate.config, {
-          oauth2: Object.assign(state.identityProviderCreate.config.oauth2, {
-            fieldMapping: Object.assign(state.identityProviderCreate.config.oauth2.fieldMapping, {
-              [field]: e.target.value,
-            }),
-          }),
-        }),
-      }),
+      identityProviderCreate: {
+        ...state.identityProviderCreate,
+        config: {
+          ...state.identityProviderCreate.config,
+          oauth2: {
+            ...state.identityProviderCreate.config.oauth2,
+            fieldMapping: { ...state.identityProviderCreate.config.oauth2.fieldMapping, [field]: e.target.value },
+          },
+        },
+      },
     });
   };
 
@@ -184,7 +183,7 @@ const CreateIdentityProviderDrawer: React.FC<Props> = (props: Props) => {
               </Label>
               <Input
                 id="client-secret"
-                type="text"
+                type="password"
                 placeholder="Client Secret of the OAuth2 provider"
                 value={state.identityProviderCreate.config?.oauth2?.clientSecret}
                 onChange={(e) => handleOAuth2ConfigChange(e, "clientSecret")}

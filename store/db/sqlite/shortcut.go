@@ -126,7 +126,7 @@ func (d *DB) ListShortcuts(ctx context.Context, find *store.FindShortcut) ([]*st
 	if v := find.VisibilityList; len(v) != 0 {
 		list := []string{}
 		for _, visibility := range v {
-			list = append(list, fmt.Sprintf("$%d", len(args)+1))
+			list = append(list, "?")
 			args = append(args, visibility.String())
 		}
 		where = append(where, fmt.Sprintf("visibility in (%s)", strings.Join(list, ",")))

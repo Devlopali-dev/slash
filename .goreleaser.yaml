@@ -28,7 +28,7 @@ changelog:
       - "^test:"
 
 checksum:
-  disable: true
+  name_template: "checksums.txt"
 
 release:
   draft: true

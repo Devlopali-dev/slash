@@ -16,6 +16,7 @@ const ShortcutFrame = ({ shortcut }: Props) => {
         className="w-72 max-w-full border border-border bg-card text-card-foreground p-6 pb-4 rounded-2xl shadow-xl hover:opacity-80"
         to={`/s/${shortcut.name}`}
         target="_blank"
+        rel="noopener noreferrer"
       >
         <div className={classNames("w-12 h-12 flex justify-center items-center overflow-clip rounded-lg shrink-0")}>
           <LinkFavicon url={shortcut.link} />

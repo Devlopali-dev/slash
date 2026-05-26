@@ -49,6 +49,7 @@ CREATE TABLE shortcut (
 );
 
 CREATE INDEX idx_shortcut_name ON shortcut(name);
+CREATE INDEX idx_shortcut_creator_id ON shortcut(creator_id);
 
 -- activity
 CREATE TABLE activity (
@@ -74,3 +75,4 @@ CREATE TABLE collection (
 );
 
 CREATE INDEX idx_collection_name ON collection(name);
+CREATE INDEX idx_collection_creator_id ON collection(creator_id);
