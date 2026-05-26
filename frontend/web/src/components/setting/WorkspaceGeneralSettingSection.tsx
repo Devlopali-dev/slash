@@ -6,10 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { workspaceServiceClient } from "@/grpcweb";
 import { useWorkspaceStore } from "@/stores";
-import { FeatureType } from "@/stores/workspace";
 import { Visibility } from "@/types/proto/api/v1/common";
 import { WorkspaceSetting } from "@/types/proto/api/v1/workspace_service";
-import FeatureBadge from "../FeatureBadge";
 import Icon from "../Icon";
 
 const getDefaultVisibility = (visibility?: Visibility) => {
@@ -44,8 +42,7 @@ const WorkspaceGeneralSettingSection = () => {
   const [workspaceSetting, setWorkspaceSetting] = useState<WorkspaceSetting>(workspaceStore.setting);
   const originalWorkspaceSetting = useRef<WorkspaceSetting>(workspaceStore.setting);
   const allowSave = !isEqual(originalWorkspaceSetting.current, workspaceSetting);
-  const hasCustomBranding = workspaceStore.checkFeatureAvailable(FeatureType.CustomeBranding);
-  const branding = hasCustomBranding && workspaceSetting.branding ? new TextDecoder().decode(workspaceSetting.branding) : "";
+  const branding = workspaceSetting.branding ? new TextDecoder().decode(workspaceSetting.branding) : "";
 
   const onBrandingChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files: File[] = Array.from(event.target.files || []);
@@ -100,7 +97,6 @@ const WorkspaceGeneralSettingSection = () => {
           <div className="w-full flex flex-col justify-start items-start">
             <p className="flex flex-row justify-start items-center">
               <span className="font-medium text-foreground">Custom branding</span>
-              <FeatureBadge className="w-5 h-auto ml-1 text-blue-600" feature={FeatureType.CustomeBranding} />
             </p>
             <p className="text-sm text-muted-foreground leading-tight">Recommand logo ratio: 1:1</p>
           </div>
@@ -119,7 +115,6 @@ const WorkspaceGeneralSettingSection = () => {
             <input
               className="absolute inset-0 z-1 opacity-0"
               type="file"
-              disabled={!hasCustomBranding}
               accept=".jpg,.jpeg,.png,.svg,.webp"
               onChange={onBrandingChange}
             />

@@ -3,12 +3,9 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { workspaceServiceClient } from "@/grpcweb";
-import { useWorkspaceStore } from "@/stores";
-import { FeatureType } from "@/stores/workspace";
 import { IdentityProvider } from "@/types/proto/api/v1/workspace_service";
 import { showCommonDialog } from "../Alert";
 import CreateIdentityProviderDrawer from "../CreateIdentityProviderDrawer";
-import FeatureBadge from "../FeatureBadge";
 import Icon from "../Icon";
 
 interface EditState {
@@ -19,18 +16,16 @@ interface EditState {
 
 const SSOSection = () => {
   const { t } = useTranslation();
-  const workspaceStore = useWorkspaceStore();
   const [identityProviderList, setIdentityProviderList] = useState<IdentityProvider[]>([]);
   const [editState, setEditState] = useState<EditState>({ open: false, identityProvider: undefined });
-  const isSSOFeatureEnabled = workspaceStore.checkFeatureAvailable(FeatureType.SSO);
 
   useEffect(() => {
     fetchIdentityProviderList();
   }, []);
 
   const fetchIdentityProviderList = async () => {
-    const setting = workspaceStore.fetchWorkspaceSetting();
-    setIdentityProviderList((await setting).identityProviders);
+    const setting = await workspaceServiceClient.getWorkspaceSetting({});
+    setIdentityProviderList(setting.identityProviders);
   };
 
   const handleDeleteIdentityProvider = async (identityProvider: IdentityProvider) => {
@@ -61,7 +56,6 @@ const SSOSection = () => {
         <div className="w-full flex flex-row justify-between items-center gap-1">
           <div className="flex flex-row justify-start items-center">
             <span className="font-medium text-foreground">SSO</span>
-            <FeatureBadge className="w-5 h-auto ml-1 text-blue-600" feature={FeatureType.SSO} />
             <a
               className="text-blue-600 text-sm hover:underline flex flex-row justify-center items-center ml-2"
               href="https://github.com/yourselfhosted/slash/blob/main/docs/getting-started/sso.md"
@@ -74,7 +68,6 @@ const SSOSection = () => {
           </div>
           <Button
             variant="outline"
-            disabled={!isSSOFeatureEnabled}
             onClick={() =>
               setEditState({
                 open: true,

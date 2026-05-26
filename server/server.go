@@ -16,9 +16,7 @@ import (
 	"github.com/yourselfhosted/slash/server/profile"
 	apiv1 "github.com/yourselfhosted/slash/server/route/api/v1"
 	"github.com/yourselfhosted/slash/server/route/frontend"
-	licensern "github.com/yourselfhosted/slash/server/runner/license"
 	"github.com/yourselfhosted/slash/server/runner/version"
-	"github.com/yourselfhosted/slash/server/service/license"
 	"github.com/yourselfhosted/slash/store"
 )
 
@@ -28,8 +26,6 @@ type Server struct {
 	Profile *profile.Profile
 	Store   *store.Store
 	Secret  string
-
-	licenseService *license.LicenseService
 
 	// API services.
 	apiV1Service *apiv1.APIV1Service
@@ -41,13 +37,10 @@ func NewServer(ctx context.Context, profile *profile.Profile, store *store.Store
 	e.HideBanner = true
 	e.HidePort = true
 
-	licenseService := license.NewLicenseService(profile, store)
-
 	s := &Server{
-		e:              e,
-		Profile:        profile,
-		Store:          store,
-		licenseService: licenseService,
+		e:       e,
+		Profile: profile,
+		Store:   store,
 	}
 
 	// Serve frontend.
@@ -65,7 +58,7 @@ func NewServer(ctx context.Context, profile *profile.Profile, store *store.Store
 		return c.String(http.StatusOK, "Service ready.")
 	})
 
-	s.apiV1Service = apiv1.NewAPIV1Service(secret, profile, store, licenseService, s.Profile.Port+1)
+	s.apiV1Service = apiv1.NewAPIV1Service(secret, profile, store, s.Profile.Port+1)
 	// Register gRPC gateway as api v1.
 	if err := s.apiV1Service.RegisterGateway(ctx, e); err != nil {
 		return nil, errors.Wrap(err, "failed to register gRPC gateway")
@@ -112,12 +105,8 @@ func (s *Server) GetEcho() *echo.Echo {
 }
 
 func (s *Server) StartBackgroundRunners(ctx context.Context) {
-	licenseRunner := licensern.NewRunner(s.Store, s.licenseService)
-	licenseRunner.RunOnce(ctx)
 	versionRunner := version.NewRunner(s.Store, s.Profile)
 	versionRunner.RunOnce(ctx)
-
-	go licenseRunner.Run(ctx)
 	go versionRunner.Run(ctx)
 }
 

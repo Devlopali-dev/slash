@@ -11,7 +11,6 @@ import (
 
 	v1pb "github.com/yourselfhosted/slash/proto/gen/api/v1"
 	storepb "github.com/yourselfhosted/slash/proto/gen/store"
-	"github.com/yourselfhosted/slash/server/service/license"
 	"github.com/yourselfhosted/slash/store"
 )
 
@@ -85,17 +84,6 @@ func (s *APIV1Service) GetCollectionByName(ctx context.Context, request *v1pb.Ge
 func (s *APIV1Service) CreateCollection(ctx context.Context, request *v1pb.CreateCollectionRequest) (*v1pb.Collection, error) {
 	if request.Collection.Name == "" || request.Collection.Title == "" {
 		return nil, status.Errorf(codes.InvalidArgument, "name and title are required")
-	}
-
-	if !s.LicenseService.IsFeatureEnabled(license.FeatureTypeUnlimitedCollections) {
-		collections, err := s.Store.ListCollections(ctx, &store.FindCollection{})
-		if err != nil {
-			return nil, status.Errorf(codes.Internal, "failed to get collection list, err: %v", err)
-		}
-		collectionsLimit := int(s.LicenseService.GetSubscription().CollectionsLimit)
-		if len(collections) >= collectionsLimit {
-			return nil, status.Errorf(codes.PermissionDenied, "Maximum number of collections %d reached", collectionsLimit)
-		}
 	}
 
 	user, err := getCurrentUser(ctx, s.Store)

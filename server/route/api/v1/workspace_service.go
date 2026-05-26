@@ -19,10 +19,6 @@ func (s *APIV1Service) GetWorkspaceProfile(ctx context.Context, _ *v1pb.GetWorks
 		Version: s.Profile.Version,
 	}
 
-	// Load subscription plan from license service.
-	subscription := s.LicenseService.GetSubscription()
-	workspaceProfile.Subscription = subscription
-
 	owner, err := s.GetInstanceOwner(ctx)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to get instance owner: %v", err)

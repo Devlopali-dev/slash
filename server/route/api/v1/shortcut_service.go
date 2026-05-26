@@ -18,7 +18,6 @@ import (
 	v1pb "github.com/yourselfhosted/slash/proto/gen/api/v1"
 	storepb "github.com/yourselfhosted/slash/proto/gen/store"
 	"github.com/yourselfhosted/slash/internal/util"
-	"github.com/yourselfhosted/slash/server/service/license"
 	"github.com/yourselfhosted/slash/store"
 )
 
@@ -109,17 +108,6 @@ func (s *APIV1Service) CreateShortcut(ctx context.Context, request *v1pb.CreateS
 	}
 	if err := util.ValidateShortcutLink(request.Shortcut.Link); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid link: %v", err)
-	}
-
-	if !s.LicenseService.IsFeatureEnabled(license.FeatureTypeUnlimitedShortcuts) {
-		shortcuts, err := s.Store.ListShortcuts(ctx, &store.FindShortcut{})
-		if err != nil {
-			return nil, status.Errorf(codes.Internal, "failed to get shortcut list, err: %v", err)
-		}
-		shortcutsLimit := int(s.LicenseService.GetSubscription().ShortcutsLimit)
-		if len(shortcuts) >= shortcutsLimit {
-			return nil, status.Errorf(codes.PermissionDenied, "Maximum number of shortcuts %d reached", shortcutsLimit)
-		}
 	}
 
 	user, err := getCurrentUser(ctx, s.Store)
@@ -283,11 +271,6 @@ func (s *APIV1Service) GetShortcutAnalytics(ctx context.Context, request *v1pb.G
 	activityFind := &store.FindActivity{
 		Type:              store.ActivityShortcutView,
 		PayloadShortcutID: &shortcut.Id,
-	}
-	// For non-advanced analytics users, we limit the activity to the last 14 days.
-	if !s.LicenseService.IsFeatureEnabled(license.FeatureTypeAdvancedAnalytics) {
-		createdTsAfter := time.Now().AddDate(0, 0, -14).Unix()
-		activityFind.CreatedTsAfter = &createdTsAfter
 	}
 	activities, err := s.Store.ListActivities(ctx, activityFind)
 	if err != nil {

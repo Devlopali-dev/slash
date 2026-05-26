@@ -1,6 +1,5 @@
 import classNames from "classnames";
 import { useWorkspaceStore } from "@/stores";
-import { FeatureType } from "@/stores/workspace";
 import Icon from "./Icon";
 
 interface Props {
@@ -9,8 +8,7 @@ interface Props {
 
 const Logo = ({ className }: Props) => {
   const workspaceStore = useWorkspaceStore();
-  const hasCustomBranding = workspaceStore.checkFeatureAvailable(FeatureType.CustomeBranding);
-  const branding = hasCustomBranding && workspaceStore.setting.branding ? new TextDecoder().decode(workspaceStore.setting.branding) : "";
+  const branding = workspaceStore.setting.branding ? new TextDecoder().decode(workspaceStore.setting.branding) : "";
   return (
     <div className={classNames("w-8 h-auto text-muted-foreground rounded-lg overflow-hidden", className)}>
       {branding ? (

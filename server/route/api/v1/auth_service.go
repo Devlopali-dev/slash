@@ -17,7 +17,6 @@ import (
 	"github.com/yourselfhosted/slash/plugin/idp/oauth2"
 	v1pb "github.com/yourselfhosted/slash/proto/gen/api/v1"
 	storepb "github.com/yourselfhosted/slash/proto/gen/store"
-	"github.com/yourselfhosted/slash/server/service/license"
 	"github.com/yourselfhosted/slash/store"
 )
 
@@ -69,10 +68,6 @@ func (s *APIV1Service) SignIn(ctx context.Context, request *v1pb.SignInRequest) 
 }
 
 func (s *APIV1Service) SignInWithSSO(ctx context.Context, request *v1pb.SignInWithSSORequest) (*v1pb.User, error) {
-	if !s.LicenseService.IsFeatureEnabled(license.FeatureTypeSSO) {
-		return nil, status.Errorf(codes.PermissionDenied, "SSO is not available in the current plan")
-	}
-
 	identityProviderSetting, err := s.Store.GetWorkspaceSetting(ctx, &store.FindWorkspaceSetting{
 		Key: storepb.WorkspaceSettingKey_WORKSPACE_SETTING_IDENTITY_PROVIDER,
 	})
@@ -271,16 +266,6 @@ func (s *APIV1Service) deleteAccessTokenFromStore(ctx context.Context, user *sto
 	return err
 }
 
-func (s *APIV1Service) checkSeatAvailability(ctx context.Context) error {
-	if !s.LicenseService.IsFeatureEnabled(license.FeatureTypeUnlimitedAccounts) {
-		userList, err := s.Store.ListUsers(ctx, &store.FindUser{})
-		if err != nil {
-			return status.Errorf(codes.Internal, "failed to list users: %v", err)
-		}
-		seats := s.LicenseService.GetSubscription().Seats
-		if len(userList) >= int(seats) {
-			return status.Errorf(codes.FailedPrecondition, "maximum number of users %d reached", seats)
-		}
-	}
+func (s *APIV1Service) checkSeatAvailability(_ context.Context) error {
 	return nil
 }

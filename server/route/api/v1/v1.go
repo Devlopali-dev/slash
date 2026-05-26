@@ -15,29 +15,26 @@ import (
 
 	v1pb "github.com/yourselfhosted/slash/proto/gen/api/v1"
 	"github.com/yourselfhosted/slash/server/profile"
-	"github.com/yourselfhosted/slash/server/service/license"
 	"github.com/yourselfhosted/slash/store"
 )
 
 type APIV1Service struct {
 	v1pb.UnimplementedWorkspaceServiceServer
-	v1pb.UnimplementedSubscriptionServiceServer
 	v1pb.UnimplementedAuthServiceServer
 	v1pb.UnimplementedUserServiceServer
 	v1pb.UnimplementedUserSettingServiceServer
 	v1pb.UnimplementedShortcutServiceServer
 	v1pb.UnimplementedCollectionServiceServer
 
-	Secret         string
-	Profile        *profile.Profile
-	Store          *store.Store
-	LicenseService *license.LicenseService
+	Secret  string
+	Profile *profile.Profile
+	Store   *store.Store
 
 	grpcServer     *grpc.Server
 	grpcServerPort int
 }
 
-func NewAPIV1Service(secret string, profile *profile.Profile, store *store.Store, licenseService *license.LicenseService, grpcServerPort int) *APIV1Service {
+func NewAPIV1Service(secret string, profile *profile.Profile, store *store.Store, grpcServerPort int) *APIV1Service {
 	authProvider := NewGRPCAuthInterceptor(store, secret)
 	grpcServer := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
@@ -49,12 +46,11 @@ func NewAPIV1Service(secret string, profile *profile.Profile, store *store.Store
 		Secret:         secret,
 		Profile:        profile,
 		Store:          store,
-		LicenseService: licenseService,
 		grpcServer:     grpcServer,
 		grpcServerPort: grpcServerPort,
 	}
 
-	v1pb.RegisterSubscriptionServiceServer(grpcServer, apiV1Service)
+
 	v1pb.RegisterWorkspaceServiceServer(grpcServer, apiV1Service)
 	v1pb.RegisterAuthServiceServer(grpcServer, apiV1Service)
 	v1pb.RegisterUserServiceServer(grpcServer, apiV1Service)
@@ -103,9 +99,6 @@ func (s *APIV1Service) RegisterGateway(_ context.Context, e *echo.Echo) error {
 	}
 
 	gwMux := runtime.NewServeMux()
-	if err := v1pb.RegisterSubscriptionServiceHandler(context.Background(), gwMux, conn); err != nil {
-		return err
-	}
 	if err := v1pb.RegisterWorkspaceServiceHandler(context.Background(), gwMux, conn); err != nil {
 		return err
 	}

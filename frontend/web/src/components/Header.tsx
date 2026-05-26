@@ -2,9 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useLocation } from "react-router-dom";
 import { authServiceClient } from "@/grpcweb";
-import { useWorkspaceStore, useUserStore } from "@/stores";
-import { stringifyPlanType } from "@/stores/subscription";
-import { PlanType } from "@/types/proto/api/v1/subscription_service";
+import { useUserStore } from "@/stores";
 import { Role } from "@/types/proto/api/v1/user_service";
 import AboutDialog from "./AboutDialog";
 import Icon from "./Icon";
@@ -14,10 +12,8 @@ import Dropdown from "./common/Dropdown";
 const Header: React.FC = () => {
   const { t } = useTranslation();
   const location = useLocation();
-  const workspaceStore = useWorkspaceStore();
   const currentUser = useUserStore().getCurrentUser();
   const [showAboutDialog, setShowAboutDialog] = useState<boolean>(false);
-  const subscription = workspaceStore.getSubscription();
   const isAdmin = currentUser.role === Role.ADMIN;
   const shouldShowRouterSwitch = location.pathname === "/shortcuts" || location.pathname === "/collections";
   const selectedSection = location.pathname === "/shortcuts" ? "Shortcuts" : location.pathname === "/collections" ? "Collections" : "";
@@ -36,11 +32,6 @@ const Header: React.FC = () => {
               <Logo className="mr-2" />
               Slash
             </Link>
-            {[PlanType.PRO, PlanType.ENTERPRISE].includes(subscription.plan) && (
-              <span className="ml-1 text-xs px-1.5 leading-5 border rounded-full bg-primary border-primary text-primary-foreground shadow">
-                {stringifyPlanType(subscription.plan)}
-              </span>
-            )}
             {shouldShowRouterSwitch && (
               <>
                 <span className="font-mono text-muted-foreground mx-1">/</span>
