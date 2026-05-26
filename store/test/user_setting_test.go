@@ -6,8 +6,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	storepb "github.com/yourselfhosted/slash/proto/gen/store"
-	"github.com/yourselfhosted/slash/store"
+	storepb "github.com/Devlopali-dev/slash/proto/gen/store"
+	"github.com/Devlopali-dev/slash/store"
 )
 
 func TestUserSettingStore(t *testing.T) {

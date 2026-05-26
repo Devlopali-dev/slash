@@ -1,7 +1,7 @@
 package license
 
 import (
-	v1pb "github.com/yourselfhosted/slash/proto/gen/api/v1"
+	v1pb "github.com/Devlopali-dev/slash/proto/gen/api/v1"
 )
 
 type FeatureType string

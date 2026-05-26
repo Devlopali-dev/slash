@@ -12,14 +12,14 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 
-	storepb "github.com/yourselfhosted/slash/proto/gen/store"
-	"github.com/yourselfhosted/slash/server/profile"
-	apiv1 "github.com/yourselfhosted/slash/server/route/api/v1"
-	"github.com/yourselfhosted/slash/server/route/frontend"
-	licensern "github.com/yourselfhosted/slash/server/runner/license"
-	"github.com/yourselfhosted/slash/server/runner/version"
-	"github.com/yourselfhosted/slash/server/service/license"
-	"github.com/yourselfhosted/slash/store"
+	storepb "github.com/Devlopali-dev/slash/proto/gen/store"
+	"github.com/Devlopali-dev/slash/server/profile"
+	apiv1 "github.com/Devlopali-dev/slash/server/route/api/v1"
+	"github.com/Devlopali-dev/slash/server/route/frontend"
+	licensern "github.com/Devlopali-dev/slash/server/runner/license"
+	"github.com/Devlopali-dev/slash/server/runner/version"
+	"github.com/Devlopali-dev/slash/server/service/license"
+	"github.com/Devlopali-dev/slash/store"
 )
 
 type Server struct {

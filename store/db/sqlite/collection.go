@@ -8,9 +8,9 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/yourselfhosted/slash/internal/util"
-	storepb "github.com/yourselfhosted/slash/proto/gen/store"
-	"github.com/yourselfhosted/slash/store"
+	"github.com/Devlopali-dev/slash/internal/util"
+	storepb "github.com/Devlopali-dev/slash/proto/gen/store"
+	"github.com/Devlopali-dev/slash/store"
 )
 
 func (d *DB) CreateCollection(ctx context.Context, create *storepb.Collection) (*storepb.Collection, error) {

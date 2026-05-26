@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/yourselfhosted/slash/store"
+	"github.com/Devlopali-dev/slash/store"
 )
 
 func (d *DB) CreateActivity(ctx context.Context, create *store.Activity) (*store.Activity, error) {

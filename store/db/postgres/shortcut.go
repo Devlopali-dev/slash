@@ -8,8 +8,8 @@ import (
 	"github.com/pkg/errors"
 	"google.golang.org/protobuf/encoding/protojson"
 
-	storepb "github.com/yourselfhosted/slash/proto/gen/store"
-	"github.com/yourselfhosted/slash/store"
+	storepb "github.com/Devlopali-dev/slash/proto/gen/store"
+	"github.com/Devlopali-dev/slash/store"
 )
 
 func (d *DB) CreateShortcut(ctx context.Context, create *storepb.Shortcut) (*storepb.Shortcut, error) {
