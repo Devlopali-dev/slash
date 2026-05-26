@@ -4,12 +4,12 @@
 
 🧩 Browser extension(v1.0.0) now available! - [Chrome Web Store](https://chrome.google.com/webstore/detail/slash/ebaiehmkammnacjadffpicipfckgeobg), [Firefox Add-on](https://addons.mozilla.org/firefox/addon/your-slash/)
 
-Getting started with Slash's [Shortcuts](https://github.com/yourselfhosted/slash/blob/main/docs/getting-started/shortcuts.md) and [Collections](https://github.com/yourselfhosted/slash/blob/main/docs/getting-started/collections.md).
+Getting started with Slash's [Shortcuts](https://github.com/Devlopali-dev/slash/blob/main/docs/getting-started/shortcuts.md) and [Collections](https://github.com/Devlopali-dev/slash/blob/main/docs/getting-started/collections.md).
 
 [👉 Join our Discord 💬](https://discord.gg/QZqUuUAhDV)
 
 <p>
-  <a href="https://hub.docker.com/r/yourselfhosted/slash"><img alt="Docker pull" src="https://img.shields.io/docker/pulls/yourselfhosted/slash.svg"/></a>
+  <a href="https://hub.docker.com/r/Devlopali-dev/slash"><img alt="Docker pull" src="https://img.shields.io/docker/pulls/Devlopali-dev/slash.svg"/></a>
   <a href="https://discord.gg/QZqUuUAhDV"><img alt="Discord" src="https://img.shields.io/badge/discord-chat-5865f2?logo=discord&logoColor=f5f5f5" /></a>
 </p>
 
@@ -33,10 +33,49 @@ That's why we developed Slash, a solution that transforms these links into easil
 ## Deploy with Docker in seconds
 
 ```bash
-docker run -d --name slash -p 5231:5231 -v ~/.slash/:/var/opt/slash yourselfhosted/slash:latest
+docker run -d --name slash -p 5231:5231 -v ~/.slash/:/var/opt/slash Devlopali-dev/slash:latest
 ```
 
-Learn more in [Self-hosting Slash with Docker](https://github.com/yourselfhosted/slash/blob/main/docs/install.md).
+Or with Docker Compose:
+
+```bash
+docker compose up -d
+```
+
+App available at `http://localhost:5231`.
+
+Learn more in [Self-hosting Slash with Docker](https://github.com/Devlopali-dev/slash/blob/main/docs/install.md).
+
+## Development
+
+Requirements: Go 1.23+, Node.js, pnpm
+
+**Backend:**
+
+```bash
+go run ./bin/slash/main.go
+# listens on :5231
+```
+
+**Frontend (hot reload):**
+
+```bash
+cd frontend/web
+pnpm install
+pnpm dev
+# listens on :3001, proxies to :5231
+```
+
+**Production build:**
+
+```bash
+# Build frontend first (embedded into the Go binary)
+cd frontend/web && pnpm build && cd ../..
+
+# Build binary
+go build -o ./slash ./bin/slash/
+./slash
+```
 
 ## Browser Extension
 
@@ -44,7 +83,7 @@ Slash provides a browser extension to help you use your shortcuts in the search 
 
 ![browser-extension-example](./docs/assets/browser-extension-example.png)
 
-Learn more in [The Browser Extension of Slash](https://github.com/yourselfhosted/slash/blob/main/docs/install-browser-extension.md).
+Learn more in [The Browser Extension of Slash](https://github.com/Devlopali-dev/slash/blob/main/docs/install-browser-extension.md).
 
 ### Chromium based browsers
 

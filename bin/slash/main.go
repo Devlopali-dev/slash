@@ -12,11 +12,11 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/yourselfhosted/slash/server"
-	"github.com/yourselfhosted/slash/server/common"
-	"github.com/yourselfhosted/slash/server/profile"
-	"github.com/yourselfhosted/slash/store"
-	"github.com/yourselfhosted/slash/store/db"
+	"github.com/Devlopali-dev/slash/server"
+	"github.com/Devlopali-dev/slash/server/common"
+	"github.com/Devlopali-dev/slash/server/profile"
+	"github.com/Devlopali-dev/slash/store"
+	"github.com/Devlopali-dev/slash/store/db"
 )
 
 const (
@@ -132,7 +132,7 @@ func printGreetings(serverProfile *profile.Profile) {
 	fmt.Printf("Version %s has been started on port %d\n", serverProfile.Version, serverProfile.Port)
 	println("---")
 	println("See more in:")
-	fmt.Printf("👉GitHub: %s\n", "https://github.com/yourselfhosted/slash")
+	fmt.Printf("👉GitHub: %s\n", "https://github.com/Devlopali-dev/slash")
 	println("---")
 }
 
