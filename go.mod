@@ -65,11 +65,10 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/mssola/useragent v1.0.0
 	github.com/pkg/errors v0.9.1
-	golang.org/x/exp v0.0.0-20250620022241-b7579e27df2b
 	golang.org/x/mod v0.35.0
-	golang.org/x/oauth2 v0.30.0
-	google.golang.org/genproto/googleapis/api v0.0.0-20250528174236-200df99c418a
-	google.golang.org/grpc v1.74.2
+	golang.org/x/oauth2 v0.36.0
+	google.golang.org/genproto/googleapis/api v0.0.0-20260414002931-afd174a4e478
+	google.golang.org/grpc v1.80.0
 	google.golang.org/protobuf v1.36.11
 	modernc.org/sqlite v1.38.2
 )
