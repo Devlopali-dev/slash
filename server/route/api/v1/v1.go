@@ -3,6 +3,8 @@ package v1
 import (
 	"context"
 	"fmt"
+	"os"
+	"strings"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
@@ -59,13 +61,33 @@ func NewAPIV1Service(secret string, profile *profile.Profile, store *store.Store
 	v1pb.RegisterUserSettingServiceServer(grpcServer, apiV1Service)
 	v1pb.RegisterShortcutServiceServer(grpcServer, apiV1Service)
 	v1pb.RegisterCollectionServiceServer(grpcServer, apiV1Service)
-	reflection.Register(grpcServer)
+	// Only expose gRPC reflection in non-production environments.
+	if profile.IsDev() {
+		reflection.Register(grpcServer)
+	}
 
 	return apiV1Service
 }
 
 func (s *APIV1Service) GetGRPCServer() *grpc.Server {
 	return s.grpcServer
+}
+
+// buildAllowedOriginsSet reads SLASH_ALLOWED_ORIGINS and returns a set of allowed origins.
+// If the env var is unset or empty, defaults to {"*"} (allow all) for backward compatibility.
+func buildAllowedOriginsSet() map[string]struct{} {
+	raw := os.Getenv("SLASH_ALLOWED_ORIGINS")
+	set := make(map[string]struct{})
+	for _, origin := range strings.Split(raw, ",") {
+		origin = strings.TrimSpace(origin)
+		if origin != "" {
+			set[origin] = struct{}{}
+		}
+	}
+	if len(set) == 0 {
+		set["*"] = struct{}{}
+	}
+	return set
 }
 
 // RegisterGateway registers the gRPC-Gateway with the given Echo instance.
@@ -105,10 +127,17 @@ func (s *APIV1Service) RegisterGateway(_ context.Context, e *echo.Echo) error {
 	e.Any("/api/v1/*", echo.WrapHandler(gwMux))
 
 	// GRPC web proxy.
+	// Allowed origins are configured via SLASH_ALLOWED_ORIGINS (comma-separated).
+	// Defaults to "*" for backward compatibility with self-hosted deployments and the browser extension.
+	allowedOrigins := buildAllowedOriginsSet()
 	options := []grpcweb.Option{
 		grpcweb.WithCorsForRegisteredEndpointsOnly(false),
-		grpcweb.WithOriginFunc(func(_ string) bool {
-			return true
+		grpcweb.WithOriginFunc(func(origin string) bool {
+			if _, ok := allowedOrigins["*"]; ok {
+				return true
+			}
+			_, ok := allowedOrigins[origin]
+			return ok
 		}),
 	}
 	wrappedGrpc := grpcweb.WrapServer(s.grpcServer, options...)

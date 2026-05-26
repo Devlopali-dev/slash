@@ -23,12 +23,24 @@ const SignIn: React.FC = () => {
         toast.error("Identity provider configuration is invalid.");
         return;
       }
-      const authUrl = `${oauth2Config.authUrl}?client_id=${
-        oauth2Config.clientId
-      }&redirect_uri=${redirectUri}&state=${stateQueryParameter}&response_type=code&scope=${encodeURIComponent(
-        oauth2Config.scopes.join(" "),
-      )}`;
-      window.location.href = authUrl;
+      let parsedAuthUrl: URL;
+      try {
+        parsedAuthUrl = new URL(oauth2Config.authUrl);
+      } catch {
+        toast.error("Identity provider auth URL is invalid.");
+        return;
+      }
+      if (parsedAuthUrl.protocol !== "https:") {
+        toast.error("Identity provider auth URL must use HTTPS.");
+        return;
+      }
+      parsedAuthUrl.searchParams.set("client_id", oauth2Config.clientId);
+      parsedAuthUrl.searchParams.set("redirect_uri", redirectUri);
+      parsedAuthUrl.searchParams.set("state", stateQueryParameter);
+      parsedAuthUrl.searchParams.set("response_type", "code");
+      // Use %20 (not +) for scope spaces — required by RFC 6749 and expected by strict providers.
+      const finalUrl = parsedAuthUrl.toString().replace(/\+/g, "%20");
+      window.location.href = finalUrl;
     }
   };
 

@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"fmt"
 	"math/big"
+	"net"
 	"net/mail"
 	"net/url"
 	"strconv"
@@ -14,6 +15,53 @@ import (
 	"github.com/nyaruka/phonenumbers"
 	"github.com/pkg/errors"
 )
+
+var privateIPNets = func() []*net.IPNet {
+	cidrs := []string{
+		"127.0.0.0/8",
+		"10.0.0.0/8",
+		"172.16.0.0/12",
+		"192.168.0.0/16",
+		"169.254.0.0/16",
+		"::1/128",
+		"fc00::/7",
+		"fe80::/10",
+	}
+	nets := make([]*net.IPNet, 0, len(cidrs))
+	for _, cidr := range cidrs {
+		_, network, _ := net.ParseCIDR(cidr)
+		nets = append(nets, network)
+	}
+	return nets
+}()
+
+// ValidateShortcutLink checks that a URL is a safe public http/https URL.
+// Rejects non-http(s) schemes, missing hosts, and literal private/loopback IPs.
+func ValidateShortcutLink(rawURL string) error {
+	u, err := url.Parse(rawURL)
+	if err != nil {
+		return errors.New("invalid URL")
+	}
+	if u.Scheme != "http" && u.Scheme != "https" {
+		return errors.Errorf("unsupported scheme %q: only http and https are allowed", u.Scheme)
+	}
+	if u.Host == "" {
+		return errors.New("URL must have a host")
+	}
+	host := u.Hostname()
+	lower := strings.ToLower(host)
+	if lower == "localhost" || strings.HasSuffix(lower, ".local") {
+		return errors.New("URL host is a private address")
+	}
+	if ip := net.ParseIP(host); ip != nil {
+		for _, network := range privateIPNets {
+			if network.Contains(ip) {
+				return errors.New("URL host is a private or reserved address")
+			}
+		}
+	}
+	return nil
+}
 
 // ConvertStringToInt32 converts a string to int32.
 func ConvertStringToInt32(src string) (int32, error) {

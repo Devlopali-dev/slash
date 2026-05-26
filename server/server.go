@@ -37,7 +37,7 @@ type Server struct {
 
 func NewServer(ctx context.Context, profile *profile.Profile, store *store.Store) (*Server, error) {
 	e := echo.New()
-	e.Debug = true
+	e.Debug = profile.Mode != "prod"
 	e.HideBanner = true
 	e.HidePort = true
 
@@ -54,14 +54,9 @@ func NewServer(ctx context.Context, profile *profile.Profile, store *store.Store
 	frontendService := frontend.NewFrontendService(profile, store)
 	frontendService.Serve(ctx, e)
 
-	// In dev mode, we'd like to set the const secret key to make signin session persistence.
-	secret := "slash"
-	if profile.Mode == "prod" {
-		var err error
-		secret, err = s.getSecretSession(ctx)
-		if err != nil {
-			return nil, err
-		}
+	secret, err := s.getSecretSession(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get secret session")
 	}
 	s.Secret = secret
 

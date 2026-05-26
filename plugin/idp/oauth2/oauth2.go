@@ -7,10 +7,12 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
 
+	"github.com/yourselfhosted/slash/internal/util"
 	"github.com/yourselfhosted/slash/plugin/idp"
 	storepb "github.com/yourselfhosted/slash/proto/gen/store"
 )
@@ -31,6 +33,16 @@ func NewIdentityProvider(config *storepb.IdentityProviderConfig_OAuth2Config) (*
 	} {
 		if v == "" {
 			return nil, errors.Errorf(`the field "%s" is empty but required`, field)
+		}
+	}
+
+	for rawURL, field := range map[string]string{
+		config.AuthUrl:     "authUrl",
+		config.TokenUrl:    "tokenUrl",
+		config.UserInfoUrl: "userInfoUrl",
+	} {
+		if err := util.ValidateShortcutLink(rawURL); err != nil {
+			return nil, errors.Errorf(`the field "%s" is invalid: %v`, field, err)
 		}
 	}
 
@@ -66,9 +78,11 @@ func (p *IdentityProvider) ExchangeToken(ctx context.Context, redirectURL, code 
 	return accessToken, nil
 }
 
+const maxUserInfoBodyBytes = 1 << 20 // 1 MiB
+
 // UserInfo returns the parsed user information using the given OAuth2 token.
 func (p *IdentityProvider) UserInfo(token string) (*idp.IdentityProviderUserInfo, error) {
-	client := &http.Client{}
+	client := &http.Client{Timeout: 10 * time.Second}
 	req, err := http.NewRequest(http.MethodGet, p.config.UserInfoUrl, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to new http request")
@@ -79,11 +93,11 @@ func (p *IdentityProvider) UserInfo(token string) (*idp.IdentityProviderUserInfo
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get user information")
 	}
-	body, err := io.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	body, err := io.ReadAll(io.LimitReader(resp.Body, maxUserInfoBodyBytes))
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to read response body")
 	}
-	defer resp.Body.Close()
 
 	var claims map[string]any
 	err = json.Unmarshal(body, &claims)
