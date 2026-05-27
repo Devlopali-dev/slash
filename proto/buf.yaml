@@ -1,4 +1,4 @@
-version: v2
+version: v1
 name: buf.build/yourselfhosted/slash
 deps:
   - buf.build/googleapis/googleapis
