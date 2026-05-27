@@ -48,7 +48,7 @@ Learn more in [Self-hosting Slash with Docker](https://github.com/Devlopali-dev/
 
 ## Development
 
-Requirements: Go 1.23+, Node.js, pnpm
+Requirements: Go 1.25+, Node.js, pnpm
 
 **Backend:**
 
