@@ -2,6 +2,7 @@ package sqlite
 
 import (
 	"database/sql"
+	"os"
 
 	"github.com/pkg/errors"
 	// SQLite driver.
@@ -42,6 +43,11 @@ func NewDB(profile *profile.Profile) (store.Driver, error) {
 	sqliteDB, err := sql.Open("sqlite", profile.DSN+"?_pragma=foreign_keys(0)&_pragma=busy_timeout(10000)&_pragma=journal_mode(WAL)")
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to open db with dsn: %s", profile.DSN)
+	}
+
+	// Restrict database file permissions to prevent unauthorized access.
+	if profile.DSN != "" {
+		_ = os.Chmod(profile.DSN, 0600)
 	}
 
 	driver := DB{db: sqliteDB, profile: profile}
