@@ -2,10 +2,11 @@ package httpgetter
 
 import (
 	"context"
-	"fmt"
 	"net"
 	"net/http"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 // privateIPNets is the set of IP ranges that must never be contacted by the httpgetter.
@@ -51,7 +52,7 @@ func safeHTTPClient() *http.Client {
 					}
 					for _, network := range privateIPNets {
 						if network.Contains(ip) {
-							return nil, fmt.Errorf("connection to private address %s is not allowed", ipStr)
+							return nil, errors.Errorf("connection to private address %s is not allowed", ipStr)
 						}
 					}
 				}

@@ -50,7 +50,6 @@ func NewAPIV1Service(secret string, profile *profile.Profile, store *store.Store
 		grpcServerPort: grpcServerPort,
 	}
 
-
 	v1pb.RegisterWorkspaceServiceServer(grpcServer, apiV1Service)
 	v1pb.RegisterAuthServiceServer(grpcServer, apiV1Service)
 	v1pb.RegisterUserServiceServer(grpcServer, apiV1Service)
