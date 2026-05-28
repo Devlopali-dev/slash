@@ -3,6 +3,7 @@ package v1
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"os"
 	"strings"
 
@@ -69,8 +70,10 @@ func (s *APIV1Service) GetGRPCServer() *grpc.Server {
 }
 
 // buildAllowedOriginsSet reads SLASH_ALLOWED_ORIGINS and returns a set of allowed origins.
-// If the env var is unset or empty, defaults to {"*"} (allow all) for backward compatibility.
-func buildAllowedOriginsSet() map[string]struct{} {
+// If the env var is unset or empty, defaults to {"*"} (allow all) for backward compatibility
+// with the browser extension and existing self-hosted deployments.
+// In production mode a warning is emitted so operators know to restrict this.
+func buildAllowedOriginsSet(mode string) map[string]struct{} {
 	raw := os.Getenv("SLASH_ALLOWED_ORIGINS")
 	set := make(map[string]struct{})
 	for _, origin := range strings.Split(raw, ",") {
@@ -81,6 +84,10 @@ func buildAllowedOriginsSet() map[string]struct{} {
 	}
 	if len(set) == 0 {
 		set["*"] = struct{}{}
+		if mode == "prod" {
+			slog.Warn("SLASH_ALLOWED_ORIGINS is not set: gRPC-Web endpoint accepts requests from any origin. " +
+				"Set SLASH_ALLOWED_ORIGINS=https://your-domain.example.com to restrict cross-origin access.")
+		}
 	}
 	return set
 }
@@ -121,7 +128,7 @@ func (s *APIV1Service) RegisterGateway(_ context.Context, e *echo.Echo) error {
 	// GRPC web proxy.
 	// Allowed origins are configured via SLASH_ALLOWED_ORIGINS (comma-separated).
 	// Defaults to "*" for backward compatibility with self-hosted deployments and the browser extension.
-	allowedOrigins := buildAllowedOriginsSet()
+	allowedOrigins := buildAllowedOriginsSet(s.Profile.Mode)
 	options := []grpcweb.Option{
 		grpcweb.WithCorsForRegisteredEndpointsOnly(false),
 		grpcweb.WithOriginFunc(func(origin string) bool {

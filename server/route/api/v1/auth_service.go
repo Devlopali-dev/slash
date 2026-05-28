@@ -3,6 +3,7 @@ package v1
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -154,6 +155,10 @@ func (s *APIV1Service) SignInWithSSO(ctx context.Context, request *v1pb.SignInWi
 	return convertUserFromStore(user), nil
 }
 
+// signupMu serializes concurrent signups to make the first-user admin
+// promotion atomic (check-then-create must not interleave with another signup).
+var signupMu sync.Mutex
+
 func (s *APIV1Service) SignUp(ctx context.Context, request *v1pb.SignUpRequest) (*v1pb.User, error) {
 	if err := checkAuthRateLimit(ctx); err != nil {
 		return nil, err
@@ -166,11 +171,6 @@ func (s *APIV1Service) SignUp(ctx context.Context, request *v1pb.SignUpRequest) 
 		return nil, status.Errorf(codes.PermissionDenied, "sign up is not allowed")
 	}
 
-	// Check if the number of users has reached the maximum.
-	if err := s.checkSeatAvailability(ctx); err != nil {
-		return nil, err
-	}
-
 	if len(request.Password) < 8 {
 		return nil, status.Errorf(codes.InvalidArgument, "password must be at least 8 characters")
 	}
@@ -180,29 +180,37 @@ func (s *APIV1Service) SignUp(ctx context.Context, request *v1pb.SignUpRequest) 
 		return nil, status.Errorf(codes.Internal, "failed to generate password hash: %v", err)
 	}
 
-	create := &store.User{
-		Email:        request.Email,
-		Nickname:     request.Nickname,
-		PasswordHash: string(passwordHash),
-		Role:         store.RoleUser,
-	}
-	user, err := s.Store.CreateUser(ctx, create)
+	// Serialize signups so the count-then-create is atomic: only the first user
+	// ever created gets promoted to admin, with no window for a concurrent signup
+	// to race past the check.
+	signupMu.Lock()
+	user, err := func() (*store.User, error) {
+		defer signupMu.Unlock()
+
+		if err := s.checkSeatAvailability(ctx); err != nil {
+			return nil, err
+		}
+
+		existing, err := s.Store.ListUsers(ctx, &store.FindUser{})
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to list users: %v", err)
+		}
+		role := store.RoleUser
+		if len(existing) == 0 {
+			role = store.RoleAdmin
+		}
+
+		return s.Store.CreateUser(ctx, &store.User{
+			Email:        request.Email,
+			Nickname:     request.Nickname,
+			PasswordHash: string(passwordHash),
+			Role:         role,
+		})
+	}()
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to create user: %v", err)
 	}
-	// Promote to admin only if this is the sole user in the DB.
-	// Checking after insert avoids the TOCTOU race of checking before insert.
-	allUsers, err := s.Store.ListUsers(ctx, &store.FindUser{})
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to list users: %v", err)
-	}
-	if len(allUsers) == 1 {
-		adminRole := store.RoleAdmin
-		user, err = s.Store.UpdateUser(ctx, &store.UpdateUser{ID: user.ID, Role: &adminRole})
-		if err != nil {
-			return nil, status.Errorf(codes.Internal, "failed to promote first user to admin: %v", err)
-		}
-	}
+
 	if err := s.doSignIn(ctx, user, time.Now().Add(AccessTokenDuration)); err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to sign in: %v", err)
 	}
