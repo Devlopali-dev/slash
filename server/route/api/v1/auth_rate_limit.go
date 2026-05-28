@@ -2,22 +2,25 @@ package v1
 
 import (
 	"context"
+	"net"
 	"strings"
 	"sync"
 	"time"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/peer"
 	"google.golang.org/grpc/status"
 )
 
 const (
-	authRateWindow   = time.Minute
-	authRateMaxBurst = 10
+	authRateWindow          = time.Minute
+	authRateMaxBurst        = 10
+	authRateCleanupInterval = 5 * time.Minute
 )
 
 var (
-	authRateMu     sync.Mutex
+	authRateMu      sync.Mutex
 	authRateClients = make(map[string]*rateBucket)
 )
 
@@ -27,44 +30,66 @@ type rateBucket struct {
 }
 
 func init() {
-	// Pre-fill tokens for each new client.
+	go func() {
+		ticker := time.NewTicker(authRateCleanupInterval)
+		defer ticker.Stop()
+		for range ticker.C {
+			pruneAuthRateClients()
+		}
+	}()
 }
 
-// extractClientIP extracts the client IP from gRPC metadata.
-// It checks x-forwarded-for, x-real-ip, and cookie headers that may contain IP info.
+func pruneAuthRateClients() {
+	cutoff := time.Now().Add(-authRateWindow * 2)
+	authRateMu.Lock()
+	defer authRateMu.Unlock()
+	for ip, c := range authRateClients {
+		if c.lastSeen.Before(cutoff) {
+			delete(authRateClients, ip)
+		}
+	}
+}
+
+// extractClientIP returns the effective client IP.
+//
+// It reads the real TCP peer address via gRPC peer context. X-Forwarded-For is
+// only trusted when the immediate peer is a loopback address (the local
+// gRPC-gateway proxy). This prevents remote clients from forging their IP by
+// injecting arbitrary XFF headers.
 func extractClientIP(ctx context.Context) string {
-	md, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		return ""
+	var peerHost string
+	if p, ok := peer.FromContext(ctx); ok && p.Addr != nil {
+		host, _, err := net.SplitHostPort(p.Addr.String())
+		if err == nil {
+			peerHost = host
+		}
 	}
 
-	for _, vals := range md["x-forwarded-for"] {
-		if vals != "" {
-			return strings.TrimSpace(strings.Split(vals, ",")[0])
-		}
-	}
-	for _, vals := range md["x-real-ip"] {
-		if vals != "" {
-			return strings.TrimSpace(vals)
-		}
-	}
-	// Fallback: use the first non-empty metadata value.
-	// This is best-effort for direct gRPC without gateway.
-	for _, vals := range md {
-		for _, v := range vals {
-			if v != "" {
-				return v
+	// Only trust XFF when the request came through the local gateway (loopback peer).
+	if isLoopbackIP(peerHost) {
+		if md, ok := metadata.FromIncomingContext(ctx); ok {
+			for _, xff := range md["x-forwarded-for"] {
+				if xff != "" {
+					return strings.TrimSpace(strings.SplitN(xff, ",", 2)[0])
+				}
 			}
 		}
 	}
-	return ""
+
+	return peerHost
 }
 
-// checkAuthRateLimit returns an error if the client has exceeded the rate limit.
+func isLoopbackIP(ip string) bool {
+	parsed := net.ParseIP(ip)
+	return parsed != nil && parsed.IsLoopback()
+}
+
+// checkAuthRateLimit returns ResourceExhausted if the client IP has exceeded
+// authRateMaxBurst authentication attempts within authRateWindow.
 func checkAuthRateLimit(ctx context.Context) error {
 	ip := extractClientIP(ctx)
 	if ip == "" {
-		return nil // Cannot determine IP, skip rate limiting.
+		return nil
 	}
 
 	authRateMu.Lock()
