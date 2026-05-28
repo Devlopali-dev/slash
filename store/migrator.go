@@ -328,8 +328,8 @@ func (s *Store) normalizedMigrationHistoryList(ctx context.Context) error {
 
 	// Insert the latest schema version to migration_history within a transaction
 	return s.executeInTransaction(ctx, func(tx *sql.Tx) error {
-		stmt := fmt.Sprintf("INSERT INTO migration_history (version) VALUES ('%s')", latestSchemaVersion)
-		if err := s.execute(ctx, tx, stmt); err != nil {
+		stmt := "INSERT INTO migration_history (version) VALUES (?)"
+		if _, err := tx.ExecContext(ctx, stmt, latestSchemaVersion); err != nil {
 			return errors.Wrapf(err, "failed to insert migration history for version: %s", latestSchemaVersion)
 		}
 		return nil
