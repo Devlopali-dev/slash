@@ -52,7 +52,7 @@ const IndexPopup = () => {
                   variant="outlined"
                   color="neutral"
                   component="a"
-                  href="https://github.com/yourselfhosted/slash"
+                  href="https://github.com/devlopali-dev/slash"
                   target="_blank"
                 >
                   <Icon.Github className="w-5 h-auto text-gray-500 dark:text-gray-400 mr-1" />

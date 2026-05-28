@@ -3,10 +3,10 @@ package db
 import (
 	"github.com/pkg/errors"
 
-	"github.com/yourselfhosted/slash/server/profile"
-	"github.com/yourselfhosted/slash/store"
-	"github.com/yourselfhosted/slash/store/db/postgres"
-	"github.com/yourselfhosted/slash/store/db/sqlite"
+	"github.com/devlopali-dev/slash/server/profile"
+	"github.com/devlopali-dev/slash/store"
+	"github.com/devlopali-dev/slash/store/db/postgres"
+	"github.com/devlopali-dev/slash/store/db/sqlite"
 )
 
 // NewDBDriver creates new db driver based on profile.

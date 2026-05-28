@@ -5,8 +5,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/yourselfhosted/slash/server/profile"
-	"github.com/yourselfhosted/slash/store"
+	"github.com/devlopali-dev/slash/server/profile"
+	"github.com/devlopali-dev/slash/store"
 )
 
 type Runner struct {

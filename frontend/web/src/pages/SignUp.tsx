@@ -88,7 +88,7 @@ const SignUp: React.FC = () => {
                   className="w-full py-3"
                   type="email"
                   value={email}
-                  placeholder="slash@yourselfhosted.com"
+                  placeholder="slash@devlopali.ovh"
                   onChange={handleEmailInputChanged}
                 />
               </div>

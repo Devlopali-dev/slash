@@ -24,7 +24,7 @@ const AboutDialog: React.FC<Props> = (props: Props) => {
             <span className="mr-2">Source code:</span>
             <a
               className="text-primary hover:underline"
-              href="https://github.com/yourselfhosted/slash"
+              href="https://github.com/devlopali-dev/slash"
               target="_blank"
               rel="noopener noreferrer"
             >

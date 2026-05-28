@@ -3,7 +3,7 @@ package store
 import (
 	"context"
 
-	storepb "github.com/yourselfhosted/slash/proto/gen/store"
+	storepb "github.com/devlopali-dev/slash/proto/gen/store"
 )
 
 type FindUserSetting struct {

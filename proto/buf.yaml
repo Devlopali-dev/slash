@@ -1,5 +1,5 @@
 version: v1
-name: buf.build/yourselfhosted/slash
+name: buf.build/devlopali-dev/slash
 deps:
   - buf.build/googleapis/googleapis
   - buf.build/grpc-ecosystem/grpc-gateway

@@ -5,7 +5,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	storepb "github.com/yourselfhosted/slash/proto/gen/store"
+	storepb "github.com/devlopali-dev/slash/proto/gen/store"
 )
 
 type FindWorkspaceSetting struct {

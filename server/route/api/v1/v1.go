@@ -13,9 +13,9 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 
-	v1pb "github.com/yourselfhosted/slash/proto/gen/api/v1"
-	"github.com/yourselfhosted/slash/server/profile"
-	"github.com/yourselfhosted/slash/store"
+	v1pb "github.com/devlopali-dev/slash/proto/gen/api/v1"
+	"github.com/devlopali-dev/slash/server/profile"
+	"github.com/devlopali-dev/slash/store"
 )
 
 type APIV1Service struct {

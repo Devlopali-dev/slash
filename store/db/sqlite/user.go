@@ -5,7 +5,7 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/yourselfhosted/slash/store"
+	"github.com/devlopali-dev/slash/store"
 )
 
 func (d *DB) CreateUser(ctx context.Context, create *store.User) (*store.User, error) {

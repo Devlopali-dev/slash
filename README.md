@@ -92,3 +92,12 @@ For Chromium based browsers(Chrome, Edge, Arc, ...), you can install the extensi
 ### Firefox
 
 For Firefox, you can install the extension from the [Firefox Add-ons](https://addons.mozilla.org/firefox/addon/your-slash/).
+## Attribution
+
+This project is a fork of the original Slash project.
+
+- Original project: Slash
+- Original copyright: Steven and original contributors
+- Fork maintained by: Devlopali
+- Modifications copyright: © 2026 Devlopali
+- License: GNU AGPL v3
