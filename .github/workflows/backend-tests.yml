@@ -22,12 +22,10 @@ jobs:
         run: |
           go mod tidy
           git diff --exit-code
-      - name: Patch go directive for linter compatibility
-        run: go mod edit -go=1.24.2
       - name: golangci-lint
         uses: golangci/golangci-lint-action@82606bf257cbaff209d206a39f5134f0cfbfd2ee # v9.2.1
         with:
-          version: v2.1.6
+          version: latest
           args: --verbose --timeout=3m
           skip-cache: true
 
