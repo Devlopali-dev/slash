@@ -1,12 +1,12 @@
-import { FormEvent, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { authServiceClient } from "@/grpcweb";
-import useLoading from "@/hooks/useLoading";
-import useNavigateTo from "@/hooks/useNavigateTo";
-import { useUserStore } from "@/stores";
+import { FormEvent, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { authServiceClient } from '@/grpcweb'
+import useLoading from '@/hooks/useLoading'
+import useNavigateTo from '@/hooks/useNavigateTo'
+import { useUserStore } from '@/stores'
 
 const PasswordAuthForm = () => {
   const { t } = useTranslation();
@@ -55,13 +55,7 @@ const PasswordAuthForm = () => {
       <div className={`flex flex-col justify-start items-start w-full ${actionBtnLoadingState.isLoading ? "opacity-80" : ""}`}>
         <div className="w-full flex flex-col mb-2">
           <span className="leading-8 mb-1 text-muted-foreground">{t("common.email")}</span>
-          <Input
-            className="w-full py-3"
-            type="email"
-            value={email}
-            placeholder="slash@devlopali.ovh"
-            onChange={handleEmailInputChanged}
-          />
+          <Input className="w-full py-3" type="email" value={email} placeholder="slash@devlopali.ovh" onChange={handleEmailInputChanged} />
         </div>
         <div className="w-full flex flex-col mb-2">
           <span className="leading-8 text-muted-foreground">{t("common.password")}</span>
