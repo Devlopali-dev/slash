@@ -3,6 +3,7 @@ package sqlite
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -15,7 +16,11 @@ import (
 
 func (d *DB) CreateShortcut(ctx context.Context, create *storepb.Shortcut) (*storepb.Shortcut, error) {
 	set := []string{"creator_id", "name", "link", "title", "description", "visibility", "tag"}
-	args := []any{create.CreatorId, create.Name, create.Link, create.Title, create.Description, create.Visibility.String(), strings.Join(create.Tags, " ")}
+	tagJSON, err := encodeTags(create.Tags)
+	if err != nil {
+		return nil, err
+	}
+	args := []any{create.CreatorId, create.Name, create.Link, create.Title, create.Description, create.Visibility.String(), tagJSON}
 	placeholder := []string{"?", "?", "?", "?", "?", "?", "?"}
 	if create.OgMetadata != nil {
 		set = append(set, "og_metadata")
@@ -62,8 +67,12 @@ func (d *DB) UpdateShortcut(ctx context.Context, update *store.UpdateShortcut) (
 	if update.Visibility != nil {
 		set, args = append(set, "visibility = ?"), append(args, update.Visibility.String())
 	}
-	if update.Tag != nil {
-		set, args = append(set, "tag = ?"), append(args, *update.Tag)
+	if update.Tags != nil {
+		tagJSON, err := encodeTags(update.Tags)
+		if err != nil {
+			return nil, err
+		}
+		set, args = append(set, "tag = ?"), append(args, tagJSON)
 	}
 	if update.OpenGraphMetadata != nil {
 		openGraphMetadataBytes, err := protojson.Marshal(update.OpenGraphMetadata)
@@ -103,7 +112,7 @@ func (d *DB) UpdateShortcut(ctx context.Context, update *store.UpdateShortcut) (
 		return nil, err
 	}
 	shortcut.Visibility = store.ConvertVisibilityStringToStorepb(visibility)
-	shortcut.Tags = filterTags(strings.Split(tags, " "))
+	shortcut.Tags = decodeTags(tags)
 	var ogMetadata storepb.OpenGraphMetadata
 	if err := protojson.Unmarshal([]byte(openGraphMetadataString), &ogMetadata); err != nil {
 		return nil, err
@@ -132,7 +141,9 @@ func (d *DB) ListShortcuts(ctx context.Context, find *store.FindShortcut) ([]*st
 		where = append(where, fmt.Sprintf("visibility in (%s)", strings.Join(list, ",")))
 	}
 	if v := find.Tag; v != nil {
-		where, args = append(where, "tag LIKE ?"), append(args, "%"+*v+"%")
+		// Exact tag match via json_each — avoids LIKE false positives (e.g. "go" matching "golang").
+		where = append(where, "EXISTS (SELECT 1 FROM json_each(tag) WHERE value = ?)")
+		args = append(args, *v)
 	}
 
 	rows, err := d.db.QueryContext(ctx, `
@@ -178,7 +189,7 @@ func (d *DB) ListShortcuts(ctx context.Context, find *store.FindShortcut) ([]*st
 			return nil, err
 		}
 		shortcut.Visibility = store.ConvertVisibilityStringToStorepb(visibility)
-		shortcut.Tags = filterTags(strings.Split(tags, " "))
+		shortcut.Tags = decodeTags(tags)
 		var ogMetadata storepb.OpenGraphMetadata
 		if err := protojson.Unmarshal([]byte(openGraphMetadataString), &ogMetadata); err != nil {
 			return nil, err
@@ -211,11 +222,41 @@ func vacuumShortcut(ctx context.Context, tx *sql.Tx) error {
 	return nil
 }
 
-func filterTags(tags []string) []string {
+// encodeTags serialises a tag slice as a JSON array string (e.g. ["go","python"]).
+func encodeTags(tags []string) (string, error) {
+	if len(tags) == 0 {
+		return "[]", nil
+	}
+	b, err := json.Marshal(tags)
+	if err != nil {
+		return "", err
+	}
+	return string(b), nil
+}
+
+// decodeTags deserialises a tag value from the database.
+// It handles both the new JSON format (["go","python"]) and the legacy
+// space-separated format ("go python") for backward compatibility with
+// rows that were not yet migrated.
+func decodeTags(raw string) []string {
+	raw = strings.TrimSpace(raw)
+	if strings.HasPrefix(raw, "[") {
+		var tags []string
+		if err := json.Unmarshal([]byte(raw), &tags); err == nil {
+			result := make([]string, 0, len(tags))
+			for _, t := range tags {
+				if t != "" {
+					result = append(result, t)
+				}
+			}
+			return result
+		}
+	}
+	// Legacy: space-separated
 	result := []string{}
-	for _, tag := range tags {
-		if tag != "" {
-			result = append(result, tag)
+	for _, t := range strings.Split(raw, " ") {
+		if t != "" {
+			result = append(result, t)
 		}
 	}
 	return result

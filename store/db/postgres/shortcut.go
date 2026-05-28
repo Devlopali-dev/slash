@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -14,7 +15,11 @@ import (
 
 func (d *DB) CreateShortcut(ctx context.Context, create *storepb.Shortcut) (*storepb.Shortcut, error) {
 	set := []string{"creator_id", "name", "link", "title", "description", "visibility", "tag"}
-	args := []any{create.CreatorId, create.Name, create.Link, create.Title, create.Description, create.Visibility.String(), strings.Join(create.Tags, " ")}
+	tagJSON, err := encodeTags(create.Tags)
+	if err != nil {
+		return nil, err
+	}
+	args := []any{create.CreatorId, create.Name, create.Link, create.Title, create.Description, create.Visibility.String(), tagJSON}
 	if create.OgMetadata != nil {
 		set = append(set, "og_metadata")
 		openGraphMetadataBytes, err := protojson.Marshal(create.OgMetadata)
@@ -57,8 +62,12 @@ func (d *DB) UpdateShortcut(ctx context.Context, update *store.UpdateShortcut) (
 	if update.Visibility != nil {
 		set, args = append(set, fmt.Sprintf("visibility = $%d", len(args)+1)), append(args, update.Visibility.String())
 	}
-	if update.Tag != nil {
-		set, args = append(set, fmt.Sprintf("tag = $%d", len(args)+1)), append(args, *update.Tag)
+	if update.Tags != nil {
+		tagJSON, err := encodeTags(update.Tags)
+		if err != nil {
+			return nil, err
+		}
+		set, args = append(set, fmt.Sprintf("tag = $%d", len(args)+1)), append(args, tagJSON)
 	}
 	if update.OpenGraphMetadata != nil {
 		openGraphMetadataBytes, err := protojson.Marshal(update.OpenGraphMetadata)
@@ -97,7 +106,7 @@ func (d *DB) UpdateShortcut(ctx context.Context, update *store.UpdateShortcut) (
 		return nil, err
 	}
 	shortcut.Visibility = store.ConvertVisibilityStringToStorepb(visibility)
-	shortcut.Tags = filterTags(strings.Split(tags, " "))
+	shortcut.Tags = decodeTags(tags)
 	var ogMetadata storepb.OpenGraphMetadata
 	if err := protojson.Unmarshal([]byte(openGraphMetadataString), &ogMetadata); err != nil {
 		return nil, err
@@ -126,7 +135,12 @@ func (d *DB) ListShortcuts(ctx context.Context, find *store.FindShortcut) ([]*st
 		where = append(where, fmt.Sprintf("visibility IN (%s)", strings.Join(list, ",")))
 	}
 	if v := find.Tag; v != nil {
-		where, args = append(where, fmt.Sprintf("tag LIKE %s", placeholder(len(args)+1))), append(args, "%"+*v+"%")
+		// Exact tag match via json_array_elements_text — avoids LIKE false positives.
+		where = append(where, fmt.Sprintf(
+			"EXISTS (SELECT 1 FROM json_array_elements_text(tag::json) AS t WHERE t = %s)",
+			placeholder(len(args)+1),
+		))
+		args = append(args, *v)
 	}
 
 	rows, err := d.db.QueryContext(ctx, fmt.Sprintf(`
@@ -171,7 +185,7 @@ func (d *DB) ListShortcuts(ctx context.Context, find *store.FindShortcut) ([]*st
 			return nil, err
 		}
 		shortcut.Visibility = store.ConvertVisibilityStringToStorepb(visibility)
-		shortcut.Tags = filterTags(strings.Split(tags, " "))
+		shortcut.Tags = decodeTags(tags)
 		var ogMetadata storepb.OpenGraphMetadata
 		if err := protojson.Unmarshal([]byte(openGraphMetadataString), &ogMetadata); err != nil {
 			return nil, err
@@ -191,11 +205,35 @@ func (d *DB) DeleteShortcut(ctx context.Context, delete *store.DeleteShortcut) e
 	return err
 }
 
-func filterTags(tags []string) []string {
+func encodeTags(tags []string) (string, error) {
+	if len(tags) == 0 {
+		return "[]", nil
+	}
+	b, err := json.Marshal(tags)
+	if err != nil {
+		return "", err
+	}
+	return string(b), nil
+}
+
+func decodeTags(raw string) []string {
+	raw = strings.TrimSpace(raw)
+	if strings.HasPrefix(raw, "[") {
+		var tags []string
+		if err := json.Unmarshal([]byte(raw), &tags); err == nil {
+			result := make([]string, 0, len(tags))
+			for _, t := range tags {
+				if t != "" {
+					result = append(result, t)
+				}
+			}
+			return result
+		}
+	}
 	result := []string{}
-	for _, tag := range tags {
-		if tag != "" {
-			result = append(result, tag)
+	for _, t := range strings.Split(raw, " ") {
+		if t != "" {
+			result = append(result, t)
 		}
 	}
 	return result

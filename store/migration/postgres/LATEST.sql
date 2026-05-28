@@ -44,7 +44,7 @@ CREATE TABLE shortcut (
   title TEXT NOT NULL DEFAULT '',
   description TEXT NOT NULL DEFAULT '',
   visibility TEXT NOT NULL CHECK (visibility IN ('WORKSPACE', 'PUBLIC')) DEFAULT 'WORKSPACE',
-  tag TEXT NOT NULL DEFAULT '',
+  tag TEXT NOT NULL DEFAULT '[]',
   og_metadata TEXT NOT NULL DEFAULT '{}'
 );
 

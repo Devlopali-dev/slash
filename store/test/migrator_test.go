@@ -16,11 +16,11 @@ func TestGetCurrentSchemaVersion(t *testing.T) {
 	}{
 		{
 			driver:   "sqlite",
-			expected: "1.0.1",
+			expected: "1.0.2",
 		},
 		{
 			driver:   "postgres",
-			expected: "1.0.1",
+			expected: "1.0.2",
 		},
 	}
 
@@ -120,7 +120,7 @@ func TestGetSchemaVersionOfMigrateScript(t *testing.T) {
 		{
 			name:     "latest schema file",
 			filePath: "migration/sqlite/LATEST.sql",
-			want:     "1.0.1", // This depends on current version
+			want:     "1.0.2",
 			wantErr:  false,
 		},
 		{

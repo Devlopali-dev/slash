@@ -14,7 +14,7 @@ type UpdateShortcut struct {
 	Title             *string
 	Description       *string
 	Visibility        *storepb.Visibility
-	Tag               *string
+	Tags              []string
 	OpenGraphMetadata *storepb.OpenGraphMetadata
 }
 

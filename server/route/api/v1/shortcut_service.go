@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"slices"
-	"strings"
 	"time"
 
 	"github.com/mssola/useragent"
@@ -200,8 +199,7 @@ func (s *APIV1Service) UpdateShortcut(ctx context.Context, request *v1pb.UpdateS
 		case "description":
 			update.Description = &request.Shortcut.Description
 		case "tags":
-			tag := strings.Join(request.Shortcut.Tags, " ")
-			update.Tag = &tag
+			update.Tags = request.Shortcut.Tags
 		case "visibility":
 			visibility := convertVisibilityToStorepb(request.Shortcut.Visibility)
 			update.Visibility = &visibility
