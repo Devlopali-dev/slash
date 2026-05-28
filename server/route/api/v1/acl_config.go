@@ -26,6 +26,7 @@ func isUnauthorizeAllowedMethod(methodName string) bool {
 var allowedMethodsOnlyForAdmin = map[string]bool{
 	"/slash.api.v1.UserService/ListUsers":                   true,
 	"/slash.api.v1.UserService/CreateUser":                  true,
+	"/slash.api.v1.UserService/GetUser":                     true,
 	"/slash.api.v1.UserService/DeleteUser":                  true,
 	"/slash.api.v1.WorkspaceService/UpdateWorkspaceSetting": true,
 	"/slash.api.v1.SubscriptionService/UpdateSubscription":  true,
