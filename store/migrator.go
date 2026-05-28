@@ -195,7 +195,7 @@ func (s *Store) GetCurrentSchemaVersion() (string, error) {
 		return "", errors.Wrap(err, "failed to read migration files")
 	}
 
-\tslices.Sort(filePaths)
+	slices.Sort(filePaths)
 	if len(filePaths) == 0 {
 		return fmt.Sprintf("%s.0", minorVersion), nil
 	}
@@ -303,7 +303,7 @@ func (s *Store) normalizedMigrationHistoryList(ctx context.Context) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to read migration files")
 	}
-\tslices.Sort(filePaths)
+	slices.Sort(filePaths)
 	schemaVersionMap := map[string]string{}
 	for _, filePath := range filePaths {
 		fileSchemaVersion, err := s.getSchemaVersionOfMigrateScript(filePath)

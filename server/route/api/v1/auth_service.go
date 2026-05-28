@@ -36,6 +36,9 @@ func (s *APIV1Service) GetAuthStatus(ctx context.Context, _ *v1pb.GetAuthStatusR
 }
 
 func (s *APIV1Service) SignIn(ctx context.Context, request *v1pb.SignInRequest) (*v1pb.User, error) {
+	if err := checkAuthRateLimit(ctx); err != nil {
+		return nil, err
+	}
 	user, err := s.Store.GetUser(ctx, &store.FindUser{
 		Email: &request.Email,
 	})
@@ -68,6 +71,9 @@ func (s *APIV1Service) SignIn(ctx context.Context, request *v1pb.SignInRequest) 
 }
 
 func (s *APIV1Service) SignInWithSSO(ctx context.Context, request *v1pb.SignInWithSSORequest) (*v1pb.User, error) {
+	if err := checkAuthRateLimit(ctx); err != nil {
+		return nil, err
+	}
 	identityProviderSetting, err := s.Store.GetWorkspaceSetting(ctx, &store.FindWorkspaceSetting{
 		Key: storepb.WorkspaceSettingKey_WORKSPACE_SETTING_IDENTITY_PROVIDER,
 	})
@@ -149,6 +155,9 @@ func (s *APIV1Service) SignInWithSSO(ctx context.Context, request *v1pb.SignInWi
 }
 
 func (s *APIV1Service) SignUp(ctx context.Context, request *v1pb.SignUpRequest) (*v1pb.User, error) {
+	if err := checkAuthRateLimit(ctx); err != nil {
+		return nil, err
+	}
 	workspaceSecuritySetting, err := s.Store.GetWorkspaceSecuritySetting(ctx)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to get workspace security setting: %v", err)
