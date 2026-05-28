@@ -10,6 +10,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/pkg/errors"
 
 	storepb "github.com/devlopali-dev/slash/proto/gen/store"
@@ -36,6 +37,22 @@ func NewServer(ctx context.Context, profile *profile.Profile, store *store.Store
 	e.Debug = profile.Mode != "prod"
 	e.HideBanner = true
 	e.HidePort = true
+
+	// Security headers middleware.
+	e.Use(middleware.Recover())
+	e.Use(middleware.RequestID())
+	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			c.Response().Header().Set("X-Content-Type-Options", "nosniff")
+			c.Response().Header().Set("X-Frame-Options", "DENY")
+			c.Response().Header().Set("X-XSS-Protection", "1; mode=block")
+			c.Response().Header().Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+			c.Response().Header().Set("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; frame-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'")
+			c.Response().Header().Set("Referrer-Policy", "strict-origin-when-cross-origin")
+			c.Response().Header().Set("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+			return next(c)
+		}
+	})
 
 	s := &Server{
 		e:       e,
