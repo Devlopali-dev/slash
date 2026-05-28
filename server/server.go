@@ -62,7 +62,9 @@ func NewServer(ctx context.Context, profile *profile.Profile, store *store.Store
 
 	// Serve frontend.
 	frontendService := frontend.NewFrontendService(profile, store)
-	frontendService.Serve(ctx, e)
+	if err := frontendService.Serve(ctx, e); err != nil {
+		return nil, errors.Wrap(err, "failed to serve frontend")
+	}
 
 	secret, err := s.getSecretSession(ctx)
 	if err != nil {

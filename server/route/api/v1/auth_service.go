@@ -174,6 +174,9 @@ func (s *APIV1Service) SignUp(ctx context.Context, request *v1pb.SignUpRequest) 
 	if len(request.Password) < 8 {
 		return nil, status.Errorf(codes.InvalidArgument, "password must be at least 8 characters")
 	}
+	if len(request.Password) > 72 {
+		return nil, status.Errorf(codes.InvalidArgument, "password must be at most 72 characters")
+	}
 
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(request.Password), 12)
 	if err != nil {

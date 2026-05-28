@@ -41,12 +41,21 @@ func NewFrontendService(profile *profile.Profile, store *store.Store) *FrontendS
 	}
 }
 
-func (s *FrontendService) Serve(_ context.Context, e *echo.Echo) {
+func (s *FrontendService) Serve(_ context.Context, e *echo.Echo) error {
+	distFS, err := getFileSystem("dist")
+	if err != nil {
+		return err
+	}
+	assetsFS, err := getFileSystem("dist/assets")
+	if err != nil {
+		return err
+	}
+
 	// Use echo static middleware to serve the built dist folder.
 	// Reference: https://github.com/labstack/echo/blob/master/middleware/static.go
 	e.Use(middleware.StaticWithConfig(middleware.StaticConfig{
 		HTML5:      true,
-		Filesystem: getFileSystem("dist"),
+		Filesystem: distFS,
 		Skipper: func(c echo.Context) bool {
 			return util.HasPrefixes(c.Path(), "/api", "/slash.api.v1", "/s/:shortcutName", "/c/:collectionName")
 		},
@@ -69,13 +78,14 @@ func (s *FrontendService) Serve(_ context.Context, e *echo.Echo) {
 	})
 	assetsGroup.Use(middleware.StaticWithConfig(middleware.StaticConfig{
 		HTML5:      true,
-		Filesystem: getFileSystem("dist/assets"),
+		Filesystem: assetsFS,
 		Skipper: func(c echo.Context) bool {
 			return util.HasPrefixes(c.Path(), "/api", "/slash.api.v1", "/s/:shortcutName", "/c/:collectionName")
 		},
 	}))
 
 	s.registerRoutes(e)
+	return nil
 }
 
 func (s *FrontendService) registerRoutes(e *echo.Echo) {
@@ -162,13 +172,12 @@ func getReadUserIP(r *http.Request) string {
 	return ip
 }
 
-func getFileSystem(path string) http.FileSystem {
-	fs, err := fs.Sub(embeddedFiles, path)
+func getFileSystem(path string) (http.FileSystem, error) {
+	sub, err := fs.Sub(embeddedFiles, path)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-
-	return http.FS(fs)
+	return http.FS(sub), nil
 }
 
 func generateShortcutMetadata(shortcut *storepb.Shortcut) *Metadata {

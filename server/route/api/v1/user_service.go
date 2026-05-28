@@ -60,6 +60,9 @@ func (s *APIV1Service) CreateUser(ctx context.Context, request *v1pb.CreateUserR
 	if len(request.User.Password) < 8 {
 		return nil, status.Errorf(codes.InvalidArgument, "password must be at least 8 characters")
 	}
+	if len(request.User.Password) > 72 {
+		return nil, status.Errorf(codes.InvalidArgument, "password must be at most 72 characters")
+	}
 
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(request.User.Password), 12)
 	if err != nil {
