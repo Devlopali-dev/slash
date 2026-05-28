@@ -134,7 +134,7 @@ func (s *APIV1Service) SignInWithSSO(ctx context.Context, request *v1pb.SignInWi
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to generate random password, err: %s", err)
 		}
-		passwordHash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+		passwordHash, err := bcrypt.GenerateFromPassword([]byte(password), 12)
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to generate password hash, err: %s", err)
 		}
@@ -175,7 +175,7 @@ func (s *APIV1Service) SignUp(ctx context.Context, request *v1pb.SignUpRequest) 
 		return nil, status.Errorf(codes.InvalidArgument, "password must be at least 8 characters")
 	}
 
-	passwordHash, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte(request.Password), 12)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to generate password hash: %v", err)
 	}
