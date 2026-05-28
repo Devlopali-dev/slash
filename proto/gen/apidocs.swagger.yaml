@@ -151,7 +151,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/apiv1Collection'
+            $ref: '#/definitions/apiV1Collection'
         default:
           description: An unexpected error response.
           schema:
@@ -161,7 +161,7 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/apiv1Collection'
+            $ref: '#/definitions/apiV1Collection'
       tags:
         - CollectionService
   /api/v1/collections/{collection.id}:
@@ -172,7 +172,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/apiv1Collection'
+            $ref: '#/definitions/apiV1Collection'
         default:
           description: An unexpected error response.
           schema:
@@ -210,7 +210,7 @@ paths:
                   type: integer
                   format: int32
               visibility:
-                $ref: '#/definitions/apiv1Visibility'
+                $ref: '#/definitions/apiV1Visibility'
         - name: updateMask
           in: query
           required: false
@@ -225,7 +225,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/apiv1Collection'
+            $ref: '#/definitions/apiV1Collection'
         default:
           description: An unexpected error response.
           schema:
@@ -281,7 +281,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/apiv1Shortcut'
+            $ref: '#/definitions/apiV1Shortcut'
         default:
           description: An unexpected error response.
           schema:
@@ -291,7 +291,7 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/apiv1Shortcut'
+            $ref: '#/definitions/apiV1Shortcut'
       tags:
         - ShortcutService
   /api/v1/shortcuts/{id}:
@@ -302,7 +302,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/apiv1Shortcut'
+            $ref: '#/definitions/apiV1Shortcut'
         default:
           description: An unexpected error response.
           schema:
@@ -365,7 +365,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/apiv1Shortcut'
+            $ref: '#/definitions/apiV1Shortcut'
         default:
           description: An unexpected error response.
           schema:
@@ -404,7 +404,7 @@ paths:
               description:
                 type: string
               visibility:
-                $ref: '#/definitions/apiv1Visibility'
+                $ref: '#/definitions/apiV1Visibility'
               viewCount:
                 type: integer
                 format: int32
@@ -577,7 +577,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/apiv1UserSetting'
+            $ref: '#/definitions/apiV1UserSetting'
         default:
           description: An unexpected error response.
           schema:
@@ -598,7 +598,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/apiv1UserSetting'
+            $ref: '#/definitions/apiV1UserSetting'
         default:
           description: An unexpected error response.
           schema:
@@ -615,7 +615,7 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/apiv1UserSetting'
+            $ref: '#/definitions/apiV1UserSetting'
       tags:
         - UserSettingService
   /api/v1/users/{user.id}:
@@ -681,7 +681,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/apiv1WorkspaceSetting'
+            $ref: '#/definitions/apiV1WorkspaceSetting'
         default:
           description: An unexpected error response.
           schema:
@@ -694,7 +694,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/apiv1WorkspaceSetting'
+            $ref: '#/definitions/apiV1WorkspaceSetting'
         default:
           description: An unexpected error response.
           schema:
@@ -705,7 +705,7 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/apiv1WorkspaceSetting'
+            $ref: '#/definitions/apiV1WorkspaceSetting'
       tags:
         - WorkspaceService
   /v1/subscription:
@@ -778,7 +778,7 @@ definitions:
         description: |-
           expires_at is the expiration time of the access token.
           If expires_at is not set, the access token will never expire.
-  apiv1Collection:
+  apiV1Collection:
     type: object
     properties:
       id:
@@ -805,8 +805,8 @@ definitions:
           type: integer
           format: int32
       visibility:
-        $ref: '#/definitions/apiv1Visibility'
-  apiv1IdentityProvider:
+        $ref: '#/definitions/apiV1Visibility'
+  apiV1IdentityProvider:
     type: object
     properties:
       id:
@@ -815,22 +815,22 @@ definitions:
       title:
         type: string
       type:
-        $ref: '#/definitions/apiv1IdentityProviderType'
+        $ref: '#/definitions/apiV1IdentityProviderType'
       config:
-        $ref: '#/definitions/apiv1IdentityProviderConfig'
-  apiv1IdentityProviderConfig:
+        $ref: '#/definitions/apiV1IdentityProviderConfig'
+  apiV1IdentityProviderConfig:
     type: object
     properties:
       oauth2:
-        $ref: '#/definitions/apiv1IdentityProviderConfigOAuth2Config'
-  apiv1IdentityProviderConfigFieldMapping:
+        $ref: '#/definitions/apiV1IdentityProviderConfigOAuth2Config'
+  apiV1IdentityProviderConfigFieldMapping:
     type: object
     properties:
       identifier:
         type: string
       displayName:
         type: string
-  apiv1IdentityProviderConfigOAuth2Config:
+  apiV1IdentityProviderConfigOAuth2Config:
     type: object
     properties:
       clientId:
@@ -848,14 +848,14 @@ definitions:
         items:
           type: string
       fieldMapping:
-        $ref: '#/definitions/apiv1IdentityProviderConfigFieldMapping'
-  apiv1IdentityProviderType:
+        $ref: '#/definitions/apiV1IdentityProviderConfigFieldMapping'
+  apiV1IdentityProviderType:
     type: string
     enum:
       - TYPE_UNSPECIFIED
       - OAUTH2
     default: TYPE_UNSPECIFIED
-  apiv1Shortcut:
+  apiV1Shortcut:
     type: object
     properties:
       id:
@@ -883,32 +883,32 @@ definitions:
       description:
         type: string
       visibility:
-        $ref: '#/definitions/apiv1Visibility'
+        $ref: '#/definitions/apiV1Visibility'
       viewCount:
         type: integer
         format: int32
       ogMetadata:
         $ref: '#/definitions/v1ShortcutOpenGraphMetadata'
-  apiv1UserSetting:
+  apiV1UserSetting:
     type: object
     properties:
       userId:
         type: integer
         format: int32
       general:
-        $ref: '#/definitions/apiv1UserSettingGeneralSetting'
+        $ref: '#/definitions/apiV1UserSettingGeneralSetting'
       accessTokens:
-        $ref: '#/definitions/apiv1UserSettingAccessTokensSetting'
-  apiv1UserSettingAccessTokensSetting:
+        $ref: '#/definitions/apiV1UserSettingAccessTokensSetting'
+  apiV1UserSettingAccessTokensSetting:
     type: object
     properties:
       accessTokens:
         type: array
         items:
           type: object
-          $ref: '#/definitions/apiv1UserSettingAccessTokensSettingAccessToken'
+          $ref: '#/definitions/apiV1UserSettingAccessTokensSettingAccessToken'
         title: Nested repeated field
-  apiv1UserSettingAccessTokensSettingAccessToken:
+  apiV1UserSettingAccessTokensSettingAccessToken:
     type: object
     properties:
       accessToken:
@@ -917,21 +917,21 @@ definitions:
       description:
         type: string
         description: A description for the access token.
-  apiv1UserSettingGeneralSetting:
+  apiV1UserSettingGeneralSetting:
     type: object
     properties:
       locale:
         type: string
       colorTheme:
         type: string
-  apiv1Visibility:
+  apiV1Visibility:
     type: string
     enum:
       - VISIBILITY_UNSPECIFIED
       - WORKSPACE
       - PUBLIC
     default: VISIBILITY_UNSPECIFIED
-  apiv1WorkspaceSetting:
+  apiV1WorkspaceSetting:
     type: object
     properties:
       instanceUrl:
@@ -942,13 +942,13 @@ definitions:
         format: byte
         description: The workspace custome branding.
       defaultVisibility:
-        $ref: '#/definitions/apiv1Visibility'
+        $ref: '#/definitions/apiV1Visibility'
         description: The default visibility of shortcuts and collections.
       identityProviders:
         type: array
         items:
           type: object
-          $ref: '#/definitions/apiv1IdentityProvider'
+          $ref: '#/definitions/apiV1IdentityProvider'
         description: The identity providers.
       disallowUserRegistration:
         type: boolean
@@ -1000,7 +1000,7 @@ definitions:
         type: array
         items:
           type: object
-          $ref: '#/definitions/apiv1Collection'
+          $ref: '#/definitions/apiV1Collection'
   v1ListShortcutsResponse:
     type: object
     properties:
@@ -1008,7 +1008,7 @@ definitions:
         type: array
         items:
           type: object
-          $ref: '#/definitions/apiv1Shortcut'
+          $ref: '#/definitions/apiV1Shortcut'
   v1ListUserAccessTokensResponse:
     type: object
     properties:

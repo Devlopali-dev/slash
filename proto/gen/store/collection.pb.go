@@ -150,8 +150,8 @@ const file_store_collection_proto_rawDesc = "" +
 	"\n" +
 	"visibility\x18\n" +
 	" \x01(\x0e2\x17.slash.store.VisibilityR\n" +
-	"visibilityB\xa0\x01\n" +
-	"\x0fcom.slash.storeB\x0fCollectionProtoP\x01Z/github.com/devlopali-dev/slash/proto/gen/store\xa2\x02\x03SSX\xaa\x02\vSlash.Store\xca\x02\vSlash\\Store\xe2\x02\x17Slash\\Store\\GPBMetadata\xea\x02\fSlash::Storeb\x06proto3"
+	"visibilityB\x9f\x01\n" +
+	"\x0fcom.slash.storeB\x0fCollectionProtoP\x01Z.github.com/devlopali-dev/slash/proto/gen/store\xa2\x02\x03SSX\xaa\x02\vSlash.Store\xca\x02\vSlash\\Store\xe2\x02\x17Slash\\Store\\GPBMetadata\xea\x02\fSlash::Storeb\x06proto3"
 
 var (
 	file_store_collection_proto_rawDescOnce sync.Once

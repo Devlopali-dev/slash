@@ -466,8 +466,8 @@ const file_store_workspace_setting_proto_rawDesc = "" +
 	"\x1dWORKSPACE_SETTING_LICENSE_KEY\x10\n" +
 	"\x12$\n" +
 	" WORKSPACE_SETTING_SECRET_SESSION\x10\v\x12(\n" +
-	"$WORKSPACE_SETTING_DEFAULT_VISIBILITY\x10\rB\xa6\x01\n" +
-	"\x0fcom.slash.storeB\x15WorkspaceSettingProtoP\x01Z/github.com/devlopali-dev/slash/proto/gen/store\xa2\x02\x03SSX\xaa\x02\vSlash.Store\xca\x02\vSlash\\Store\xe2\x02\x17Slash\\Store\\GPBMetadata\xea\x02\fSlash::Storeb\x06proto3"
+	"$WORKSPACE_SETTING_DEFAULT_VISIBILITY\x10\rB\xa5\x01\n" +
+	"\x0fcom.slash.storeB\x15WorkspaceSettingProtoP\x01Z.github.com/devlopali-dev/slash/proto/gen/store\xa2\x02\x03SSX\xaa\x02\vSlash.Store\xca\x02\vSlash\\Store\xe2\x02\x17Slash\\Store\\GPBMetadata\xea\x02\fSlash::Storeb\x06proto3"
 
 var (
 	file_store_workspace_setting_proto_rawDescOnce sync.Once
