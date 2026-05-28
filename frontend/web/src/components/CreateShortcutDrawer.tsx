@@ -126,7 +126,11 @@ const CreateShortcutDrawer: React.FC<Props> = (props: Props) => {
     setPartialState({
       shortcutCreate: {
         ...state.shortcutCreate,
-        ogMetadata: { ...state.shortcutCreate.ogMetadata, image: e.target.value },
+        ogMetadata: {
+            title: state.shortcutCreate.ogMetadata?.title ?? "",
+            description: state.shortcutCreate.ogMetadata?.description ?? "",
+            image: e.target.value,
+          },
       },
     });
   };
@@ -135,7 +139,11 @@ const CreateShortcutDrawer: React.FC<Props> = (props: Props) => {
     setPartialState({
       shortcutCreate: {
         ...state.shortcutCreate,
-        ogMetadata: { ...state.shortcutCreate.ogMetadata, title: e.target.value },
+        ogMetadata: {
+            title: e.target.value,
+            description: state.shortcutCreate.ogMetadata?.description ?? "",
+            image: state.shortcutCreate.ogMetadata?.image ?? "",
+          },
       },
     });
   };
@@ -144,7 +152,11 @@ const CreateShortcutDrawer: React.FC<Props> = (props: Props) => {
     setPartialState({
       shortcutCreate: {
         ...state.shortcutCreate,
-        ogMetadata: { ...state.shortcutCreate.ogMetadata, description: e.target.value },
+        ogMetadata: {
+            title: state.shortcutCreate.ogMetadata?.title ?? "",
+            description: e.target.value,
+            image: state.shortcutCreate.ogMetadata?.image ?? "",
+          },
       },
     });
   };
