@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"net/url"
 	"os"
 	"os/signal"
+	"regexp"
 	"syscall"
 
 	"github.com/spf13/cobra"
@@ -120,10 +122,23 @@ func init() {
 	viper.AutomaticEnv()
 }
 
+// redactDSN removes credentials from a DSN before logging.
+// Handles both URL format (postgres://user:pass@host/db) and
+// key-value format (host=x password=secret dbname=y).
+func redactDSN(dsn string) string {
+	if u, err := url.Parse(dsn); err == nil && u.User != nil {
+		if _, hasPassword := u.User.Password(); hasPassword {
+			return u.Redacted()
+		}
+	}
+	// Key-value format: redact password=<value>
+	return regexp.MustCompile(`(?i)(password\s*=\s*)\S+`).ReplaceAllString(dsn, "${1}***")
+}
+
 func printGreetings(serverProfile *profile.Profile) {
 	fmt.Fprintln(os.Stderr, "---")
 	fmt.Fprintln(os.Stderr, "Server profile")
-	fmt.Fprintln(os.Stderr, "dsn:", serverProfile.DSN)
+	fmt.Fprintln(os.Stderr, "dsn:", redactDSN(serverProfile.DSN))
 	fmt.Fprintln(os.Stderr, "port:", serverProfile.Port)
 	fmt.Fprintln(os.Stderr, "mode:", serverProfile.Mode)
 	fmt.Fprintln(os.Stderr, "version:", serverProfile.Version)
