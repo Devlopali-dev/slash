@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useUserStore, useWorkspaceStore } from "@/stores";
 
-interface Context {}
+type Context = object;
 
 const CommonContext = createContext<Context>({});
 
@@ -17,7 +17,7 @@ const CommonContextProvider = ({ children }: { children: React.ReactNode }) => {
         await workspaceStore.fetchWorkspaceProfile();
         await workspaceStore.fetchWorkspaceSetting();
         await userStore.fetchCurrentUser();
-      } catch (error) {
+      } catch {
         // Do nothing.
       }
       setInitialized(true);

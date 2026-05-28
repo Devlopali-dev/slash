@@ -13,9 +13,14 @@ func ConvertRowStatusStringToStorepb(status string) storepb.RowStatus {
 }
 
 func ConvertVisibilityStringToStorepb(visibility string) storepb.Visibility {
-	if visibility == "PUBLIC" {
+	switch visibility {
+	case "PUBLIC":
 		return storepb.Visibility_PUBLIC
+	case "WORKSPACE":
+		return storepb.Visibility_WORKSPACE
+	default:
+		// 'PRIVATE' or any unknown value: treat as WORKSPACE (the minimum shared scope).
+		// PRIVATE was removed in migration 1.0; rows with this value should not exist.
+		return storepb.Visibility_WORKSPACE
 	}
-	// Otherwise, fallback to workspace visibility.
-	return storepb.Visibility_WORKSPACE
 }

@@ -13,5 +13,6 @@ graphify-out
 .idea
 .remember
 .claude
+AUDIT.md
 
 dist/

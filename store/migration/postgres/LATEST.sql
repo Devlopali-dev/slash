@@ -43,7 +43,7 @@ CREATE TABLE shortcut (
   link TEXT NOT NULL,
   title TEXT NOT NULL DEFAULT '',
   description TEXT NOT NULL DEFAULT '',
-  visibility TEXT NOT NULL CHECK (visibility IN ('PRIVATE', 'WORKSPACE', 'PUBLIC')) DEFAULT 'PRIVATE',
+  visibility TEXT NOT NULL CHECK (visibility IN ('WORKSPACE', 'PUBLIC')) DEFAULT 'WORKSPACE',
   tag TEXT NOT NULL DEFAULT '',
   og_metadata TEXT NOT NULL DEFAULT '{}'
 );
@@ -71,7 +71,7 @@ CREATE TABLE collection (
   title TEXT NOT NULL DEFAULT '',
   description TEXT NOT NULL DEFAULT '',
   shortcut_ids INTEGER ARRAY NOT NULL,
-  visibility TEXT NOT NULL CHECK (visibility IN ('PRIVATE', 'WORKSPACE', 'PUBLIC')) DEFAULT 'PRIVATE'
+  visibility TEXT NOT NULL CHECK (visibility IN ('WORKSPACE', 'PUBLIC')) DEFAULT 'WORKSPACE'
 );
 
 CREATE INDEX idx_collection_name ON collection(name);

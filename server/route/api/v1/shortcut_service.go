@@ -29,6 +29,10 @@ func (s *APIV1Service) ListShortcuts(ctx context.Context, _ *v1pb.ListShortcutsR
 	}
 	if currentUser == nil {
 		find.VisibilityList = []storepb.Visibility{storepb.Visibility_PUBLIC}
+	} else if currentUser.Role != store.RoleAdmin {
+		// Non-admin members see WORKSPACE and PUBLIC shortcuts only.
+		// This prevents any stale PRIVATE (VISIBILITY_UNSPECIFIED) rows from leaking.
+		find.VisibilityList = []storepb.Visibility{storepb.Visibility_WORKSPACE, storepb.Visibility_PUBLIC}
 	}
 	shortcutList, err := s.Store.ListShortcuts(ctx, find)
 	if err != nil {

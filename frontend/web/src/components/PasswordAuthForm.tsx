@@ -1,12 +1,12 @@
-import { FormEvent, useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { authServiceClient } from '@/grpcweb'
-import useLoading from '@/hooks/useLoading'
-import useNavigateTo from '@/hooks/useNavigateTo'
-import { useUserStore } from '@/stores'
+import { FormEvent, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { authServiceClient } from "@/grpcweb";
+import useLoading from "@/hooks/useLoading";
+import useNavigateTo from "@/hooks/useNavigateTo";
+import { useUserStore } from "@/stores";
 
 const PasswordAuthForm = () => {
   const { t } = useTranslation();

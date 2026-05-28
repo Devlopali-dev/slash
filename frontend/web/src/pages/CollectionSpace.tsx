@@ -7,7 +7,7 @@ import ShortcutFrame from "@/components/ShortcutFrame";
 import ShortcutView from "@/components/ShortcutView";
 import { Separator } from "@/components/ui/separator";
 import useResponsiveWidth from "@/hooks/useResponsiveWidth";
-import { useUserStore, useCollectionStore, useShortcutStore } from "@/stores";
+import { useCollectionStore, useShortcutStore, useUserStore } from "@/stores";
 import { Collection } from "@/types/proto/api/v1/collection_service";
 import { Shortcut } from "@/types/proto/api/v1/shortcut_service";
 
@@ -35,7 +35,7 @@ const CollectionSpace = () => {
             setShortcuts((shortcuts) => {
               return [...shortcuts, shortcut];
             });
-          } catch (error) {
+          } catch {
             // Do nothing.
           }
         }
