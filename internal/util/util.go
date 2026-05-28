@@ -1,6 +1,7 @@
 package util
 
 import (
+	"context"
 	"crypto/rand"
 	"fmt"
 	"math/big"
@@ -9,6 +10,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 	"unicode/utf8"
 
 	"github.com/google/uuid"
@@ -72,6 +74,38 @@ func ValidateShortcutLink(rawURL string) error {
 		for _, network := range privateIPNets {
 			if network.Contains(ip) {
 				return errors.New("URL host is a private or reserved address")
+			}
+		}
+	}
+	return nil
+}
+
+// ValidateShortcutLinkResolved performs DNS resolution and checks the resolved
+// IP against private/reserved ranges to prevent DNS rebinding attacks.
+func ValidateShortcutLinkResolved(ctx context.Context, rawURL string) error {
+	if err := ValidateShortcutLink(rawURL); err != nil {
+		return err
+	}
+	u, err := url.Parse(rawURL)
+	if err != nil {
+		return err
+	}
+	domain := u.Hostname()
+
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+	ips, err := net.DefaultResolver.LookupHost(ctx, domain)
+	if err != nil {
+		return errors.Errorf("DNS resolution failed: %v", err)
+	}
+	for _, ipStr := range ips {
+		ip := net.ParseIP(ipStr)
+		if ip == nil {
+			continue
+		}
+		for _, network := range privateIPNets {
+			if network.Contains(ip) {
+				return errors.Errorf("DNS resolved to private address %s", ipStr)
 			}
 		}
 	}
