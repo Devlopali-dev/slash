@@ -1,6 +1,7 @@
 package store
 
 import (
+	"database/sql"
 	"sync"
 
 	"github.com/devlopali-dev/slash/server/profile"
@@ -28,4 +29,9 @@ func New(driver Driver, profile *profile.Profile) *Store {
 // Close closes the database connection.
 func (s *Store) Close() error {
 	return s.driver.Close()
+}
+
+// GetDB exposes the underlying *sql.DB for direct queries in tests.
+func (s *Store) GetDB() *sql.DB {
+	return s.driver.GetDB()
 }
