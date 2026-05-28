@@ -189,8 +189,6 @@ func (c *SMTPClient) SetAuthCredentials(username, password string) *SMTPClient {
 
 func (c *SMTPClient) getAuth() smtp.Auth {
 	switch c.authType {
-	case SMTPAuthTypeNone:
-		return nil
 	case SMTPAuthTypePlain:
 		return smtp.PlainAuth("", c.username, c.password, c.host)
 	case SMTPAuthTypeLogin:

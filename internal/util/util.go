@@ -34,7 +34,6 @@ var privateIPNets = func() []*net.IPNet {
 	return nets
 }()
 
-// ValidateShortcutLink checks that a URL is a safe public http/https URL.
 // ValidateHTTPURL checks that rawURL uses http or https and has a host.
 // It does NOT block private IPs — use this for OAuth2 endpoints where SSRF
 // is mitigated at request time by safeHTTPClient.
@@ -166,7 +165,7 @@ func SanitizeUTF8String(s string) string {
 		_, wid := utf8.DecodeRuneInString(s[i:])
 		if wid == 1 {
 			i++
-			_, _ = b.WriteString(fmt.Sprintf("\\x%02x", c))
+			_, _ = fmt.Fprintf(&b, "\\x%02x", c)
 			continue
 		}
 		_, _ = b.WriteString(s[i : i+wid])
@@ -207,4 +206,3 @@ func TruncateStringWithDescription(str string) string {
 	}
 	return str
 }
-

@@ -144,6 +144,8 @@ func (s *APIV1Service) UpdateCollection(ctx context.Context, request *v1pb.Updat
 		case "visibility":
 			visibility := convertVisibilityToStorepb(request.Collection.Visibility)
 			update.Visibility = &visibility
+		default:
+			// unknown field, skip
 		}
 	}
 	collection, err = s.Store.UpdateCollection(ctx, update)

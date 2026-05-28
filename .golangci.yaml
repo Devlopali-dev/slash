@@ -63,6 +63,10 @@ linters:
           disabled: true
         - name: use-any
           disabled: true
+        - name: package-naming
+          disabled: true
+        - name: package-directory-mismatch
+          disabled: true
         - name: exported
           disabled: true
         - name: unhandled-error
@@ -98,4 +102,4 @@ formatters:
   settings:
     goimports:
       local-prefixes:
-        - github.com/usememos/memos
+        - github.com/devlopali-dev/slash

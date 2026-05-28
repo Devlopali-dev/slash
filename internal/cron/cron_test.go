@@ -132,7 +132,7 @@ func TestCronMustAdd(t *testing.T) {
 
 	defer func() {
 		if r := recover(); r == nil {
-			t.Errorf("test1 didn't panic")
+			t.Error("test1 didn't panic")
 		}
 	}()
 

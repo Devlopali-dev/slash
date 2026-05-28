@@ -1,7 +1,7 @@
 package common
 
 import (
-	"sort"
+	"slices"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -87,7 +87,14 @@ func TestSortVersion(t *testing.T) {
 		},
 	}
 	for _, test := range tests {
-		sort.Sort(SortVersion(test.versionList))
+		slices.SortFunc(test.versionList, func(a, b string) int {
+			if IsVersionGreaterThan(a, b) {
+				return 1
+			} else if IsVersionGreaterThan(b, a) {
+				return -1
+			}
+			return 0
+		})
 		assert.Equal(t, test.versionList, test.want)
 	}
 }

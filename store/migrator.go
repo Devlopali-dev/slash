@@ -2,14 +2,13 @@ package store
 
 import (
 	"context"
-
 	"database/sql"
 	"embed"
 	"fmt"
 	"io/fs"
 	"log/slog"
 	"path/filepath"
-	"sort"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -55,7 +54,14 @@ func (s *Store) Migrate(ctx context.Context) error {
 		for _, migrationHistory := range migrationHistoryList {
 			migrationHistoryVersions = append(migrationHistoryVersions, migrationHistory.Version)
 		}
-		sort.Sort(common.SortVersion(migrationHistoryVersions))
+		slices.SortFunc(migrationHistoryVersions, func(a, b string) int {
+			if common.IsVersionGreaterThan(a, b) {
+				return 1
+			} else if common.IsVersionGreaterThan(b, a) {
+				return -1
+			}
+			return 0
+		})
 		latestMigrationHistoryVersion := migrationHistoryVersions[len(migrationHistoryVersions)-1]
 		schemaVersion, err := s.GetCurrentSchemaVersion()
 		if err != nil {
@@ -67,7 +73,7 @@ func (s *Store) Migrate(ctx context.Context) error {
 			if err != nil {
 				return errors.Wrap(err, "failed to read migration files")
 			}
-			sort.Strings(filePaths)
+			slices.Sort(filePaths)
 
 			slog.Info("start migration", slog.String("currentSchemaVersion", latestMigrationHistoryVersion), slog.String("targetSchemaVersion", schemaVersion))
 
@@ -189,7 +195,7 @@ func (s *Store) GetCurrentSchemaVersion() (string, error) {
 		return "", errors.Wrap(err, "failed to read migration files")
 	}
 
-	sort.Strings(filePaths)
+\tslices.Sort(filePaths)
 	if len(filePaths) == 0 {
 		return fmt.Sprintf("%s.0", minorVersion), nil
 	}
@@ -278,7 +284,14 @@ func (s *Store) normalizedMigrationHistoryList(ctx context.Context) error {
 	for _, migrationHistory := range migrationHistoryList {
 		versions = append(versions, migrationHistory.Version)
 	}
-	sort.Sort(common.SortVersion(versions))
+	slices.SortFunc(versions, func(a, b string) int {
+		if common.IsVersionGreaterThan(a, b) {
+			return 1
+		} else if common.IsVersionGreaterThan(b, a) {
+			return -1
+		}
+		return 0
+	})
 	latestVersion := versions[len(versions)-1]
 	latestMinorVersion := common.GetMinorVersion(latestVersion)
 	// If the latest version is greater than or equal to 1.0, the migration history is already normalized.
@@ -290,7 +303,7 @@ func (s *Store) normalizedMigrationHistoryList(ctx context.Context) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to read migration files")
 	}
-	sort.Strings(filePaths)
+\tslices.Sort(filePaths)
 	schemaVersionMap := map[string]string{}
 	for _, filePath := range filePaths {
 		fileSchemaVersion, err := s.getSchemaVersionOfMigrateScript(filePath)

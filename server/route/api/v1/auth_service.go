@@ -266,6 +266,6 @@ func (s *APIV1Service) deleteAccessTokenFromStore(ctx context.Context, user *sto
 	return err
 }
 
-func (s *APIV1Service) checkSeatAvailability(_ context.Context) error {
+func (_ *APIV1Service) checkSeatAvailability(_ context.Context) error {
 	return nil
 }
