@@ -11,26 +11,20 @@ import (
 )
 
 func TestGetCurrentSchemaVersion(t *testing.T) {
-	tests := []struct {
-		driver   string
-		expected string
-	}{
-		{
-			driver:   "sqlite",
-			expected: "1.0.2",
-		},
-		{
-			driver:   "postgres",
-			expected: "1.0.2",
-		},
-	}
+	// Expected value: minor version of the binary + ".0" when no migration files
+	// exist for that minor version, or minor + ".N" for N migration files.
+	// Derived from the binary version so the test survives version bumps.
+	minorVersion := common.GetMinorVersion(common.GetCurrentVersion("prod"))
+	// There are currently no migration files for minor version 1.4+,
+	// so the schema version is minor + ".0".
+	expected := minorVersion + ".0"
 
-	for _, tt := range tests {
-		t.Run(tt.driver, func(t *testing.T) {
-			ts := newTestingStoreWithConfig(tt.driver)
-			currentSchemaVersion, err := ts.GetCurrentSchemaVersion()
+	for _, driver := range []string{"sqlite", "postgres"} {
+		t.Run(driver, func(t *testing.T) {
+			s := newTestingStoreWithConfig(driver)
+			currentSchemaVersion, err := s.GetCurrentSchemaVersion()
 			require.NoError(t, err)
-			require.Equal(t, tt.expected, currentSchemaVersion)
+			require.Equal(t, expected, currentSchemaVersion)
 		})
 	}
 }
@@ -121,7 +115,7 @@ func TestGetSchemaVersionOfMigrateScript(t *testing.T) {
 		{
 			name:     "latest schema file",
 			filePath: "migration/sqlite/LATEST.sql",
-			want:     "1.0.2",
+			want:     common.GetMinorVersion(common.GetCurrentVersion("prod")) + ".0",
 			wantErr:  false,
 		},
 		{
