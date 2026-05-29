@@ -20,13 +20,13 @@ import (
 // (e.g. Set-Cookie on sign-in).
 type fakeStream struct{ headers metadata.MD }
 
-func (_ *fakeStream) Method() string { return "" }
+func (*fakeStream) Method() string { return "" }
 func (s *fakeStream) SetHeader(md metadata.MD) error {
 	s.headers = metadata.Join(s.headers, md)
 	return nil
 }
-func (_ *fakeStream) SendHeader(_ metadata.MD) error { return nil }
-func (_ *fakeStream) SetTrailer(_ metadata.MD) error { return nil }
+func (*fakeStream) SendHeader(_ metadata.MD) error { return nil }
+func (*fakeStream) SetTrailer(_ metadata.MD) error { return nil }
 
 // grpcCtx returns a context carrying a fake gRPC server transport stream.
 // Required for any handler that calls grpc.SetHeader (SignIn, SignUp, SignOut).

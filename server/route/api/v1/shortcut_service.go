@@ -14,9 +14,9 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/devlopali-dev/slash/internal/util"
 	v1pb "github.com/devlopali-dev/slash/proto/gen/api/v1"
 	storepb "github.com/devlopali-dev/slash/proto/gen/store"
-	"github.com/devlopali-dev/slash/internal/util"
 	"github.com/devlopali-dev/slash/store"
 )
 
