@@ -37,9 +37,9 @@ func (r *Runner) Run(ctx context.Context) {
 			r.RunOnce(ctx)
 		case <-ctx.Done():
 			return
-			}
 		}
 	}
+}
 
 func (r *Runner) RunOnce(ctx context.Context) {
 	if r.Profile.Mode == "prod" {
