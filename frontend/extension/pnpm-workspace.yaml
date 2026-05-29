@@ -5,3 +5,9 @@ allowBuilds:
   lmdb: true
   msgpackr-extract: true
   sharp: true
+
+overrides:
+  msgpackr: '>=1.10.1'  # CVE: infinite recursion via structured clone, patched in 1.10.1
+  content-security-policy-parser: '>=0.6.0'  # CVE: prototype pollution via __proto__ policy name, patched in 0.6.0
+  svelte: '>=4.2.19 <5'  # CVE: mXSS via improper HTML escaping in <noscript> SSR, patched in 4.2.19
+# PENDING: @parcel/reporter-dev-server CVE (origin validation, dev-only) — requires plasmo to upgrade to parcel>=2.16.4; blocked on plasmo@0.90.5 (latest)
