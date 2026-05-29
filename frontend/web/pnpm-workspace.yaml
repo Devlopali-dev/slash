@@ -4,3 +4,4 @@ allowBuilds:
 
 overrides:
   ws: '>=8.17.1'
+  js-cookie: '>=3.0.7'
