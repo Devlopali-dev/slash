@@ -1,5 +1,8 @@
 name: Extension Test
 
+permissions:
+  contents: read
+
 on:
   push:
     branches:
