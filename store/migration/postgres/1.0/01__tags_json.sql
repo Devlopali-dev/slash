@@ -5,10 +5,3 @@ SET tag = CASE
     WHEN tag LIKE '[%'   THEN tag
     ELSE '["' || replace(trim(tag), ' ', '","') || '"]'
 END;
-
-UPDATE collection
-SET tag = CASE
-    WHEN trim(tag) = ''  THEN '[]'
-    WHEN tag LIKE '[%'   THEN tag
-    ELSE '["' || replace(trim(tag), ' ', '","') || '"]'
-END;

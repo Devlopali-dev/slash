@@ -16,3 +16,4 @@ graphify-out
 AUDIT.md
 
 dist/
+!/frontend/web/.pnpm-store/
