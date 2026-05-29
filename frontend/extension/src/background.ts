@@ -3,6 +3,9 @@ import { Storage } from "@plasmohq/storage";
 const storage = new Storage();
 const urlRegex = /https?:\/\/s\/(.+)/;
 
+const isAllowedHost = (hostname: string, domain: string) =>
+  hostname === domain || hostname.endsWith(`.${domain}`);
+
 chrome.webRequest.onBeforeRequest.addListener(
   (param) => {
     (async () => {
@@ -31,19 +34,19 @@ const getShortcutNameFromUrl = (urlString: string) => {
 
 const getShortcutNameFromSearchUrl = (urlString: string) => {
   const url = new URL(urlString);
-  if ((url.hostname.endsWith("google.com") || url.hostname.endsWith("bing.com")) && url.pathname === "/search") {
+  if ((isAllowedHost(url.hostname, "google.com") || isAllowedHost(url.hostname, "bing.com")) && url.pathname === "/search") {
     const params = new URLSearchParams(url.search);
     const shortcutName = params.get("q");
     if (typeof shortcutName === "string" && shortcutName.startsWith("s/")) {
       return shortcutName.slice(2);
     }
-  } else if (url.hostname.endsWith("baidu.com") && url.pathname === "/s") {
+  } else if (isAllowedHost(url.hostname, "baidu.com") && url.pathname === "/s") {
     const params = new URLSearchParams(url.search);
     const shortcutName = params.get("wd");
     if (typeof shortcutName === "string" && shortcutName.startsWith("s/")) {
       return shortcutName.slice(2);
     }
-  } else if (url.hostname.endsWith("duckduckgo.com") && url.pathname === "/") {
+  } else if (isAllowedHost(url.hostname, "duckduckgo.com") && url.pathname === "/") {
     const params = new URLSearchParams(url.search);
     const shortcutName = params.get("q");
     if (typeof shortcutName === "string" && shortcutName.startsWith("s/")) {
