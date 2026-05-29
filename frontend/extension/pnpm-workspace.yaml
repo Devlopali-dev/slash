@@ -9,5 +9,7 @@ allowBuilds:
 overrides:
   msgpackr: '>=1.10.1'  # CVE: infinite recursion via structured clone, patched in 1.10.1
   content-security-policy-parser: '>=0.6.0'  # CVE: prototype pollution via __proto__ policy name, patched in 0.6.0
-  svelte: '>=4.2.19 <5'  # CVE: mXSS via improper HTML escaping in <noscript> SSR, patched in 4.2.19
+  svelte: '>=5.55.7'  # multiple SSR XSS CVEs (spread attrs, contenteditable, DOM clobbering); 4.x fully affected, patched in 5.55.7
 # PENDING: @parcel/reporter-dev-server CVE (origin validation, dev-only) — requires plasmo to upgrade to parcel>=2.16.4; blocked on plasmo@0.90.5 (latest)
+# PENDING: esbuild CVE (CORS Access-Control-Allow-Origin:* on dev server, dev-only) — requires esbuild>=0.25.0; blocked on plasmo@0.90.5 (latest)
+# PENDING: tsup CVE (DOM Clobbering in CJS shims, low) — no patched version exists; build-tool only, not extension runtime
