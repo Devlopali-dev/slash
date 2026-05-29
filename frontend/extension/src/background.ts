@@ -3,8 +3,7 @@ import { Storage } from "@plasmohq/storage";
 const storage = new Storage();
 const urlRegex = /https?:\/\/s\/(.+)/;
 
-const isAllowedHost = (hostname: string, domain: string) =>
-  hostname === domain || hostname.endsWith(`.${domain}`);
+const isAllowedHost = (hostname: string, domain: string) => hostname === domain || hostname.endsWith(`.${domain}`);
 
 chrome.webRequest.onBeforeRequest.addListener(
   (param) => {
