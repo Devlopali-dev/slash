@@ -1,8 +1,7 @@
-version: 1
+version: 2
 
 before:
   hooks:
-    # You may remove this if you don't use go modules.
     - go mod tidy
 
 builds:
@@ -15,8 +14,8 @@ builds:
       - darwin
 
 archives:
-  - format: tar.gz
-    # this name template makes the OS and Arch compatible with the results of `uname`.
+  - formats:
+      - tar.gz
     name_template: >-
       {{ .ProjectName }}_{{ .Tag }}_{{ .Os }}_{{ .Arch }}
 
@@ -31,8 +30,6 @@ checksum:
   name_template: "checksums.txt"
 
 release:
-  draft: true
-  replace_existing_draft: true
   make_latest: true
   mode: replace
   skip_upload: false
