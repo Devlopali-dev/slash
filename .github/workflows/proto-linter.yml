@@ -22,6 +22,8 @@ jobs:
           fetch-depth: 0
       - name: Setup buf
         uses: bufbuild/buf-setup-action@v1.49.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
       - name: buf mod update
         run: buf mod update
         working-directory: proto

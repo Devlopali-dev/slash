@@ -3,10 +3,10 @@ package teststore
 import (
 	"testing"
 
-	"github.com/stretchr/testify/require"
 	"github.com/devlopali-dev/slash/server/common"
 	"github.com/devlopali-dev/slash/server/profile"
 	"github.com/devlopali-dev/slash/store"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGetCurrentSchemaVersion(t *testing.T) {
